@@ -1,0 +1,27 @@
+[server]
+enableStaticServing = true
+maxUploadSize = 5
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "light"
+primaryColor = "#155645"
+backgroundColor = "#F5F6F3"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#14231E"
+borderColor = "#DCE4DF"
+linkColor = "#155645"
+font = "'Instrument Sans', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+headingFont = "'Instrument Sans', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+baseRadius = "8px"
+
+[[theme.fontFaces]]
+family = "Instrument Sans"
+url = "app/static/fonts/InstrumentSans-latin-wght.woff2"
+weight = "400 700"
+style = "normal"

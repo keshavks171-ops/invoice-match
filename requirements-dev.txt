@@ -1,0 +1,4 @@
+# Extra tools: tests and the optional LightGBM challenger (not needed to run the app).
+-r requirements.txt
+pytest==9.2.0
+lightgbm==4.7.0
