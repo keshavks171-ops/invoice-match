@@ -215,9 +215,12 @@ def test_changing_the_review_limit_changes_queued_for_review():
 
 def test_demo_case_below_the_limit_is_shown_without_changing_the_queue():
     at = start_demo()
-    at.number_input(key="review_limit").set_value(5).run()
-    queue_before = list(at.radio(key="queue_choice").options)
     ranking_before = at.session_state["dataset"].queue["incoming_id"].tolist()
+    rank = ranking_before.index(DEMO_RECURRING) + 1
+    assert rank > 1, "the legitimate recurring bill should not be the model's top match"
+    limit = rank - 1  # the largest review limit that leaves the recurring bill out
+    at.number_input(key="review_limit").set_value(limit).run()
+    queue_before = list(at.radio(key="queue_choice").options)
 
     at.segmented_control(key="demo_case").set_value("recurring_bill").run()
     assert not at.exception
@@ -227,24 +230,26 @@ def test_demo_case_below_the_limit_is_shown_without_changing_the_queue():
     assert at.session_state["dataset"].queue["incoming_id"].tolist() == ranking_before
 
     text = page_html(at)
-    rank = ranking_before.index(DEMO_RECURRING) + 1
-    assert f"Ranked {rank} of 32, below the review limit of 5. Shown as a demo case." in text
+    assert f"Ranked {rank} of 32, below the review limit of {limit}. Shown as a demo case." in text
     assert "Why this ranks lower" in text and "Why this was flagged" not in text
     assert "Different billing period" in text
 
 
 def test_picking_a_queue_row_clears_the_demo_case_selector():
     at = start_demo()
-    second = at.radio(key="queue_choice").options[1]
-    queue_ids = at.session_state["dataset"].queue["incoming_id"].tolist()
-    at.radio(key="queue_choice").set_value(queue_ids[1]).run()
-    assert at.session_state["selected_id"] == queue_ids[1]
+    dataset = at.session_state["dataset"]
+    case_ids = {case["incoming_id"] for case in dataset.cases}
+    other_id = next(incoming_id for incoming_id in dataset.queue["incoming_id"] if incoming_id not in case_ids)
+    options_before = list(at.radio(key="queue_choice").options)
+    at.radio(key="queue_choice").set_value(other_id).run()
+    assert at.session_state["selected_id"] == other_id
     assert at.segmented_control(key="demo_case").value is None
-    assert second == at.radio(key="queue_choice").options[1]
+    assert list(at.radio(key="queue_choice").options) == options_before
 
 
 def test_ambiguous_case_shows_missing_reference_and_accepts_needs_more_information():
     at = start_demo()
+    at.number_input(key="review_limit").set_value(32).run()  # every invoice is in the queue
     at.segmented_control(key="demo_case").set_value("ambiguous").run()
     text = page_html(at)
     assert "Invoice reference missing on incoming invoice" in text
@@ -364,12 +369,21 @@ def test_plain_amount_never_uses_floats():
 # Helpers that keep user text harmless
 # --------------------------------------------------------------------------
 
-def test_escape_markdown_neutralises_markup_and_line_breaks():
-    assert app.escape_markdown("A*B") == "A\\*B"
-    assert app.escape_markdown("[x](http://e.test)") == "\\[x\\]\\(http\\:\\/\\/e\\.test\\)"
-    assert app.escape_markdown(":red[hi] $5$ <b>") == "\\:red\\[hi\\] \\$5\\$ \\<b\\>"
-    assert app.escape_markdown("two\n\n# lines") == "two \\# lines"
-    assert app.escape_markdown("Plain Name 42") == "Plain Name 42"
+def test_literal_markdown_wraps_text_in_a_code_span_it_cannot_close():
+    assert app.literal_markdown("Plain Name 42") == "` Plain Name 42 `"
+    assert app.literal_markdown("*bold* [x](http://e.test) :red[hi] $5$") == "` *bold* [x](http://e.test) :red[hi] $5$ `"
+    assert app.literal_markdown("two\n\n# lines") == "` two # lines `"  # one line, so no heading
+    assert app.literal_markdown("a ` b") == "`` a ` b ``"
+    assert app.literal_markdown("a ``` b ` c") == "```` a ``` b ` c ````"
+
+
+def test_queue_row_text_is_literal_markdown():
+    row = pd.Series({"vendor": "**Bold** Co", "invoice_ref": "[ref](http://e.test)", "amount_cents": 46820})
+    assert app.queue_row_label(row) == "` **Bold** Co ` ` $468.20 `"
+    assert app.queue_row_caption(row, app.NOT_REVIEWED) == "` [ref](http://e.test) ` \u00b7 Not reviewed"
+    assert app.queue_row_caption(row, "Possible duplicate") == "` [ref](http://e.test) ` :orange-badge[Possible duplicate]"
+    blank = pd.Series({"vendor": "A", "invoice_ref": "", "amount_cents": 100})
+    assert app.queue_row_caption(blank, app.NOT_REVIEWED) == "No reference \u00b7 Not reviewed"
 
 
 def test_cards_escape_html_in_user_text():
@@ -423,17 +437,28 @@ def test_contributions_table_adds_up_to_the_decision_value(fixture_dataset: app.
                                 fixture_dataset.payments.loc[entry["payment_id"]])
     total = table["contribution"].sum() + table.attrs["intercept"]
     assert total == pytest.approx(entry["score"], abs=1e-6)
-    text = app.contributions_html(table, float(entry["score"]))
+    text = app.contributions_html(table, float(entry["score"]), app.feature_labels(model.config))
     assert text.count("<tr>") == len(table) + 3  # header, one row per feature, intercept, sum
     assert app.signed(float(entry["score"])) in text
 
 
-def test_feature_label_and_signed_formatting():
-    assert app.feature_label("amount_exact") == "Amounts equal"
-    assert app.feature_label("amount_exact*vendor_fuzzy") == "Amounts equal × Vendor name similarity (spelling)"
+def test_feature_labels_name_every_model_input_on_the_configured_scale():
+    labels = app.feature_labels(matcher.DEFAULT_CONFIG)
+    assert set(labels) == set(matcher.BASE_FEATURES)
+    assert labels["amount_diff"] == "Amount difference (log of cents apart)"
+    other = matcher.MatcherConfig(amount_transform="relative", date_transform="capped_90")
+    assert app.feature_labels(other)["amount_diff"] == "Amount difference (share of the larger amount)"
+    assert app.feature_labels(other)["date_gap"] == "Invoice date gap (days apart, up to 90)"
+    assert app.feature_label("amount_exact", labels) == "Amounts equal"
+    assert app.feature_label("amount_exact*vendor_fuzzy", labels) == (
+        f"Amounts equal {app.TIMES_SIGN} Vendor name similarity (spelling)")
+    assert app.feature_label("not_a_known_input", labels) == "not_a_known_input"
+
+
+def test_signed_numbers_use_a_real_minus_sign():
     assert app.signed(1.5) == "+1.50"
-    assert app.signed(-0.25) == "−0.25"
-    assert set(matcher.BASE_FEATURES) <= set(app.FEATURE_LABELS)
+    assert app.signed(-0.25) == f"{app.MINUS_SIGN}0.25"
+    assert app.MINUS_SIGN == "\u2212" and app.TIMES_SIGN == "\u00d7"
 
 
 def test_next_unreviewed_skips_decided_items_and_wraps_around():

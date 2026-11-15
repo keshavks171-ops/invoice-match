@@ -21,12 +21,13 @@ from __future__ import annotations
 
 import html
 import json
-import string
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 import ledger
 import matcher
@@ -54,9 +55,8 @@ TIMES_SIGN = "\u00d7"
 
 SCORE_CAPTION = "A ranking score, not a probability. The decision is yours."
 NO_PAYMENTS_MESSAGE = (
-    "No prior payments to compare against. The prior payments file has column names but no rows, "
-    "so no incoming invoice can be checked for an earlier copy. "
-    "Upload a prior payments CSV with at least one row to build a review queue."
+    "No prior payments to compare against. Without payment history no incoming invoice can be "
+    "checked for an earlier copy. Upload a prior payments CSV with at least one row to build a review queue."
 )
 BENCHMARK_EMPTY_HTML = (
     '<div class="im-empty"><p>Benchmark results are not available yet. '
@@ -72,12 +72,20 @@ FEATURE_LABELS = {
     "ref_missing_incoming": "Reference missing on incoming invoice",
     "ref_missing_payment": "Reference missing on prior payment",
     "amount_exact": "Amounts equal",
-    "amount_diff": "Amount difference",
-    "date_gap": "Days between invoice dates",
     "period_same": "Same billing period",
     "period_different": "Different billing period",
     "period_missing_incoming": "Billing period missing on incoming invoice",
     "period_missing_payment": "Billing period missing on prior payment",
+}
+
+# The amount and date inputs are measured on the scale chosen in the model's config.
+AMOUNT_SCALE_LABELS = {
+    "log1p_cents": "Amount difference (log of cents apart)",
+    "relative": "Amount difference (share of the larger amount)",
+}
+DATE_SCALE_LABELS = {
+    "log1p_days": "Invoice date gap (log of days apart)",
+    "capped_90": "Invoice date gap (days apart, up to 90)",
 }
 
 EXPORT_COLUMNS = (
@@ -119,7 +127,10 @@ class Dataset:
     cases: list[dict]
 
 
-@st.cache_resource(show_spinner="Fitting the matching model on the synthetic training ledgers (once, a few seconds)...")
+MODEL_SPINNER = "Fitting the matching model on the synthetic training ledgers (once, a few seconds)..."
+
+
+@st.cache_resource(show_spinner=MODEL_SPINNER)
 def get_matcher() -> matcher.LearnedMatcher:
     """The fitted model, shared by every session. It holds training data only, never uploads."""
     return matcher.fit_shipped_matcher()
@@ -217,12 +228,21 @@ def build_export_csv(dataset: Dataset, decisions: dict[str, str]) -> bytes:
 # Escaping and HTML fragments
 # --------------------------------------------------------------------------
 # Streamlit widget labels are Markdown and st.html takes raw HTML, so text
-# from a CSV must be made harmless before it is placed in either.
+# from a CSV is made literal (literal_markdown, html.escape) before it is
+# placed in either.
 
-def escape_markdown(text: str) -> str:
-    """Show user text literally in a widget label: every punctuation mark gets a backslash."""
+def literal_markdown(text: str) -> str:
+    """Show text literally in a widget label by wrapping it in a Markdown code span.
+
+    Inside a code span nothing is markup: no bold, no links, no colour
+    directives, and a web address is not turned into a link. The span is closed
+    by a run of backticks one longer than any run inside the text, so the text
+    cannot end it early. The stylesheet makes the span look like ordinary text.
+    """
     single_line = " ".join(text.split())
-    return "".join("\\" + ch if ch in string.punctuation else ch for ch in single_line)
+    longest_run = max((len(run) for run in re.findall("`+", single_line)), default=0)
+    fence = "`" * (longest_run + 1)
+    return f"{fence} {single_line} {fence}"
 
 
 def notice_html(title: str, lines: list[str], kind: str) -> str:
@@ -352,9 +372,17 @@ def verdict_html(comparisons: list[matcher.FieldComparison], in_queue: bool, dec
     )
 
 
-def feature_label(name: str) -> str:
+def feature_labels(config: matcher.MatcherConfig) -> dict[str, str]:
+    """Plain names for the model's inputs, with the amount and date scales this config uses."""
+    labels = dict(FEATURE_LABELS)
+    labels["amount_diff"] = AMOUNT_SCALE_LABELS[config.amount_transform]
+    labels["date_gap"] = DATE_SCALE_LABELS[config.date_transform]
+    return labels
+
+
+def feature_label(name: str, labels: dict[str, str]) -> str:
     """A readable name for a model input; an interaction 'a*b' reads 'A x B'."""
-    return f" {TIMES_SIGN} ".join(FEATURE_LABELS.get(part, part) for part in name.split("*"))
+    return f" {TIMES_SIGN} ".join(labels.get(part, part) for part in name.split("*"))
 
 
 def signed(value: float) -> str:
@@ -362,18 +390,21 @@ def signed(value: float) -> str:
     return f"{value:+.2f}".replace("-", MINUS_SIGN)
 
 
-def contributions_html(table: pd.DataFrame, decision_value: float) -> str:
+def contributions_html(table: pd.DataFrame, decision_value: float, labels: dict[str, str]) -> str:
     """The model's own arithmetic for one pair: each feature's push on the score, largest first."""
     ordered = table.reindex(table["contribution"].abs().sort_values(ascending=False, kind="stable").index)
     rows = "".join(
-        f'<tr><th scope="row">{html.escape(feature_label(row.feature))}</th>'
+        f'<tr><th scope="row">{html.escape(feature_label(row.feature, labels))}</th>'
         f"<td>{row.value:.2f}</td><td>{signed(row.standardized_value)}</td>"
         f"<td>{signed(row.coefficient)}</td><td>{signed(row.contribution)}</td></tr>"
         for row in ordered.itertuples(index=False)
     )
+    empty_cells = "<td></td>" * 3  # the footer rows keep the five columns of the rows above
     footer = (
-        f'<tr><th scope="row" colspan="4">Starting point (intercept)</th><td>{signed(table.attrs["intercept"])}</td></tr>'
-        f'<tr><th scope="row" colspan="4">Sum (decision value, in log-odds)</th><td>{signed(decision_value)}</td></tr>'
+        f'<tr><th scope="row">Starting point (intercept)</th>{empty_cells}'
+        f'<td>{signed(table.attrs["intercept"])}</td></tr>'
+        f'<tr><th scope="row">Sum (decision value, in log-odds)</th>{empty_cells}'
+        f"<td>{signed(decision_value)}</td></tr>"
     )
     return (
         '<div class="im-table-scroll"><table class="im-contributions">'
@@ -405,14 +436,15 @@ def activate_dataset(dataset: Dataset) -> None:
         st.session_state["selected_id"] = None  # the page falls back to the top of the queue
 
 
-def resolve_selection(dataset: Dataset, queue_ids: list[str]) -> str | None:
+def resolve_selection(dataset: Dataset, queue_ids: list[str]) -> str:
     """The invoice to show: the stored choice while it is still valid, else the top of the queue.
 
-    A demo case stays valid below the review limit; any other invoice must be in the queue.
+    A demo case stays valid below the review limit; any other invoice must be
+    in the queue. queue_ids is never empty here.
     """
     selected = st.session_state["selected_id"]
     if selected not in queue_ids and case_for_invoice(dataset, selected) is None:
-        selected = queue_ids[0] if queue_ids else None
+        selected = queue_ids[0]
     st.session_state["selected_id"] = selected
     return selected
 
@@ -456,7 +488,8 @@ def select_invoice(incoming_id: str) -> None:
 # Upload dialog
 # --------------------------------------------------------------------------
 
-def read_upload(uploaded_file, role: str, label: str) -> tuple[pd.DataFrame | None, list[str], str]:
+def read_upload(uploaded_file: UploadedFile | None, role: str,
+                label: str) -> tuple[pd.DataFrame | None, list[str], str]:
     """Parse one uploaded file. Returns (frame or None, reader notes, error HTML or '')."""
     if uploaded_file is None:
         return None, [], notice_html(f"{label} is missing.", ["Choose a .csv file for it above."], "error")
@@ -499,7 +532,11 @@ def upload_dialog() -> None:
 def review_page() -> None:
     """The 'Review queue' page: load data, pick an invoice, compare, decide, export."""
     init_state()
-    model = get_matcher()
+    try:
+        model = get_matcher()
+    except FileNotFoundError as error:  # the training data has not been generated
+        st.html(notice_html("The matching model could not be fitted.", [str(error)], "error"))
+        return
 
     title_area, action_area = st.columns([3, 2], vertical_alignment="center")
     # The buttons are handled before the rest of the page is drawn, so a click
@@ -516,9 +553,12 @@ def review_page() -> None:
         render_empty_state()
         return
 
-    title_area.caption(
-        f"{dataset.name}. Each incoming invoice is compared with {len(dataset.payments):,} prior payments."
-    )
+    if len(dataset.payments) > 0:
+        title_area.caption(
+            f"{dataset.name}. Each incoming invoice is compared with {len(dataset.payments):,} prior payments."
+        )
+    else:
+        title_area.caption(f"{dataset.name}. The prior payments file has no rows.")
     if dataset.notes:
         st.html(notice_html("Notes from reading the files", dataset.notes, "info"))
 
@@ -580,7 +620,7 @@ def render_summary(dataset: Dataset) -> int:
     return limit
 
 
-def render_demo_cases(dataset: Dataset, selected_id: str | None) -> None:
+def render_demo_cases(dataset: Dataset, selected_id: str) -> None:
     """Three prepared invoices from the demo ledger, one click away."""
     titles = {case["key"]: case["title"] for case in dataset.cases}
     shown_case = case_for_invoice(dataset, selected_id)
@@ -594,13 +634,13 @@ def render_demo_cases(dataset: Dataset, selected_id: str | None) -> None:
 
 
 def queue_row_label(row: pd.Series) -> str:
-    """Vendor and amount for one queue row (Markdown; the amount is bold so the stylesheet can place it)."""
-    return f"{escape_markdown(row['vendor'])} **{escape_markdown(ledger.format_cents(row['amount_cents']))}**"
+    """Vendor and amount for one queue row, as two literal spans that the stylesheet places left and right."""
+    return f"{literal_markdown(row['vendor'])} {literal_markdown(ledger.format_cents(row['amount_cents']))}"
 
 
 def queue_row_caption(row: pd.Series, status: str) -> str:
     """Invoice reference and review status for one queue row."""
-    reference = escape_markdown(row["invoice_ref"]) or "No reference"
+    reference = literal_markdown(row["invoice_ref"]) if row["invoice_ref"] else "No reference"
     if status == NOT_REVIEWED:
         return f"{reference} {MIDDLE_DOT} {NOT_REVIEWED}"
     return f"{reference} :{DECISION_BADGES[status]}-badge[{status}]"
@@ -610,6 +650,7 @@ def render_queue(dataset: Dataset, queue_ids: list[str], selected_id: str) -> No
     """The queue as a radio group: one row per incoming invoice, in the model's order."""
     decisions = st.session_state["decisions"]
     rows = dataset.incoming.loc[queue_ids]
+    labels = {incoming_id: queue_row_label(row) for incoming_id, row in rows.iterrows()}
     captions = [
         queue_row_caption(row, decisions.get(incoming_id, NOT_REVIEWED))
         for incoming_id, row in rows.iterrows()
@@ -624,8 +665,7 @@ def render_queue(dataset: Dataset, queue_ids: list[str], selected_id: str) -> No
         with st.container(key="queue_list"):
             st.radio(
                 "Review queue", queue_ids, index=None, key="queue_choice", on_change=on_queue_choice,
-                format_func=lambda incoming_id: queue_row_label(rows.loc[incoming_id]),
-                captions=captions, label_visibility="collapsed", width="stretch",
+                format_func=labels.get, captions=captions, label_visibility="collapsed", width="stretch",
             )
 
 
@@ -679,7 +719,8 @@ def render_model_details(model: matcher.LearnedMatcher, incoming_row: pd.Series,
             "A positive number pushed this pair up the ranking, a negative number pushed it down. "
             "This is the model's arithmetic; the field comparisons above do not depend on it."
         )
-        st.html(contributions_html(model.contributions(incoming_row, payment_row), decision_value))
+        st.html(contributions_html(model.contributions(incoming_row, payment_row), decision_value,
+                                   feature_labels(model.config)))
         settings = "frozen after validation" if model.frozen else "defaults, not yet frozen on validation"
         st.caption(
             f"Logistic regression fitted on {model.n_train_pairs:,} synthetic invoice pairs "
@@ -692,7 +733,7 @@ def render_model_details(model: matcher.LearnedMatcher, incoming_row: pd.Series,
 # --------------------------------------------------------------------------
 
 def benchmark_page() -> None:
-    """The 'Benchmark' page. evaluate.py has not written results yet, so this is an empty state."""
+    """The 'Benchmark' page. For now it is an empty state; the results view is added in a later step."""
     st.title("Benchmark", anchor=False)
     st.html(BENCHMARK_EMPTY_HTML)
 

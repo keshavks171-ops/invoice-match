@@ -24,10 +24,9 @@ Design choices worth knowing:
     (20, 10 or 5 invoices). Precision and recall are counted on the reviewed
     part. Accuracy would say little: about 1 invoice in 18 is a duplicate, so
     "flag nothing" is 94% accurate and useless.
-  * The rule for picking settings (SELECTION_CRITERION) was written down before
-    any candidate was scored. The learned model and the fuzzy rule are tuned
-    with the same rule on the same validation folds, so the baseline gets a
-    fair shot.
+  * One written rule picks the settings (SELECTION_CRITERION). The learned
+    model and the fuzzy rule are tuned with the same rule on the same
+    validation folds, so the baseline gets a fair shot.
   * Only counts are printed. No ledger row reaches the screen.
 """
 
@@ -76,6 +75,8 @@ SELECTION_CRITERION = (
 )
 # Average precision differs by about 0.02 from one validation fold to the next,
 # so a gap in the third decimal is noise and must not outvote a simpler model.
+# A first search that compared it to 4 decimals kept swapping settings on gaps
+# below 0.01 without gaining a single correct match; that is why it is this coarse.
 AP_DECIMALS = 2
 
 # A rank function takes (incoming frame, payments frame) and returns a queue frame.

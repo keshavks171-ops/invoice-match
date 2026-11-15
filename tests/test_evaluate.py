@@ -96,6 +96,7 @@ TOY_QUEUE = [
 
 @pytest.fixture()
 def toy_pool() -> pd.DataFrame:
+    """TOY_QUEUE as the pooled queue of a single ledger."""
     return pooled_queue([("L1", queue(TOY_QUEUE))])
 
 
@@ -342,6 +343,7 @@ def toy_ledger_lines(ledger_id: str, fold: int, word: str, year: int) -> tuple[l
     ]
 
     def period(month: str) -> str:
+        """'03' -> '2024-03' in the ledger's year; a blank month stays blank."""
         return f"{year}-{month}" if month else ""
 
     payment_lines = [
@@ -384,16 +386,19 @@ def toy_root(tmp_path_factory) -> Path:
 
 @pytest.fixture(scope="module")
 def toy_train(toy_root):
+    """The toy train split as BenchLedger objects."""
     return load_benchmark_split("train", toy_root / "data")
 
 
 @pytest.fixture(scope="module")
 def toy_validation(toy_root):
+    """The toy validation split: four ledgers in two folds."""
     return load_benchmark_split("validation", toy_root / "data")
 
 
 @pytest.fixture(scope="module")
 def toy_model(toy_train) -> LearnedMatcher:
+    """The default learned model fitted on the toy train split."""
     return LearnedMatcher.fit(toy_train)
 
 
@@ -566,6 +571,7 @@ def staged_root(tmp_path_factory) -> Path:
 
 
 def read_result(root: Path, name: str) -> dict:
+    """A JSON file from the results folder of a project root."""
     return json.loads((root / "results" / name).read_text(encoding="utf-8"))
 
 
@@ -790,6 +796,7 @@ needs_frozen_results = pytest.mark.skipif(
 
 @pytest.fixture(scope="module")
 def shipped() -> LearnedMatcher:
+    """The model the app uses: the project's train split with the frozen config."""
     return fit_shipped_matcher()
 
 

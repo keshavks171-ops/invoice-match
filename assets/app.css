@@ -6,10 +6,15 @@
      .st-key-NAME           the class Streamlit adds to a widget or container created with key="NAME"
      .im-*                  classes on the HTML that app.py writes itself
 
-   Spacing follows an 8px scale (4, 8, 12, 16, 24, 32). */
+   Spacing follows an 8px scale (4, 8, 12, 16, 24, 32).
 
+   Keep HTML-like text out of this file, comments included: no less-than sign
+   followed by a letter. Streamlit sanitizes the stylesheet before it is used
+   and drops all of it when it finds something that looks like a tag. */
+
+/* The canvas (#F5F6F3), the text colour and the primary colour of Streamlit's
+   own widgets are set in .streamlit/config.toml; the same palette is named here. */
 :root {
-  --im-canvas: #F5F6F3;
   --im-surface: #FFFFFF;
   --im-ink: #14231E;
   --im-muted: #52615B;
@@ -43,7 +48,6 @@
 
 /* Top bar: brand wordmark, then the two pages. */
 [data-testid="stHeader"] {
-  height: 56px;
   background: var(--im-surface);
   border-bottom: 1px solid var(--im-border);
 }
@@ -95,19 +99,27 @@
 
 /* ---------------------------------------------------------------- keyboard focus */
 
+/* One ring for every control. Streamlit's own widget styles remove the
+   outline with more specific selectors, so this rule is marked important. */
 button:focus-visible,
 a:focus-visible,
 summary:focus-visible,
 [data-testid="stNumberInputContainer"]:focus-within,
 [data-testid="stRadioGroup"] > div:has(input:focus-visible) {
-  outline: 2px solid var(--im-primary);
-  outline-offset: 2px;
+  outline: 2px solid var(--im-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* The scrolling page area can take keyboard focus too (arrow keys scroll it). */
+[data-testid="stMain"]:focus-visible {
+  outline: 2px solid var(--im-primary) !important;
+  outline-offset: -2px !important;
 }
 
 /* Queue rows sit inside a scrolling box that would clip an outer ring. */
 .st-key-queue_list [data-testid="stRadioGroup"] > div:has(input:focus-visible) {
-  outline-offset: -3px;
-  border-radius: 6px;
+  outline-offset: -4px !important;
+  border-radius: 8px;
 }
 
 /* ---------------------------------------------------------------- text */
@@ -180,6 +192,10 @@ summary:focus-visible,
   gap: 4px;
 }
 
+.st-key-demo_cases {
+  gap: 8px;
+}
+
 [data-testid="stMetricLabel"] p {
   color: var(--im-muted);
   font-size: 13px;
@@ -199,9 +215,10 @@ summary:focus-visible,
 
 /* ---------------------------------------------------------------- review queue */
 
-/* The queue stays in view while the page scrolls through the comparison.
-   Streamlit wraps a keyed container in a layout wrapper; that wrapper is the
-   element that has room to move inside the column, so it is the sticky one. */
+/* The queue stays in view, just below the 60px top bar, while the page
+   scrolls through the comparison. Streamlit wraps a keyed container in a
+   layout wrapper; that wrapper is the element that has room to move inside
+   the column, so it is the sticky one. */
 [data-testid="stLayoutWrapper"]:has(> .st-key-queue_column) {
   position: sticky;
   top: 72px;
@@ -252,11 +269,13 @@ summary:focus-visible,
   box-shadow: inset 3px 0 0 var(--im-primary), 0 -1px 0 var(--im-border);
 }
 
-.st-key-queue_list [data-testid="stRadioOption"] {
+/* Streamlit tints a focused option label; the row's focus ring replaces that tint. */
+.st-key-queue_list [data-testid="stRadioGroup"] [data-testid="stRadioOption"] {
   display: block;
   width: 100%;
   margin: 0;
   padding: 0;
+  background: none;
   cursor: pointer;
 }
 
@@ -289,7 +308,21 @@ summary:focus-visible,
   line-height: 1.4;
 }
 
-.st-key-queue_list [data-testid="stRadioOption"] strong {
+/* app.py writes the vendor, the amount and the reference as Markdown code
+   spans so they are shown literally. Here they get the look of plain text. */
+.st-key-queue_list [data-testid="stRadioGroup"] code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* The second span of a row label is the amount. */
+.st-key-queue_list [data-testid="stRadioOption"] code:last-child {
   font-weight: 650;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -323,12 +356,11 @@ summary:focus-visible,
   font-variant-numeric: tabular-nums;
 }
 
-.im-position-below {
-  display: inline-block;
+.im-panel-head .im-position-below {
   padding: 4px 12px;
   background: var(--im-differ-bg);
   border-radius: 6px;
-  color: var(--im-differ-ink) !important;
+  color: var(--im-differ-ink);
   font-weight: 500;
 }
 
@@ -364,7 +396,7 @@ summary:focus-visible,
   align-items: baseline;
   gap: 8px;
   margin: 0;
-  padding: 12px 16px;
+  padding: 10px 16px;
   color: var(--im-ink);
   font-size: 15px;
   font-weight: 650;
@@ -387,7 +419,7 @@ summary:focus-visible,
   grid-row: span 3;
   grid-template-rows: subgrid;
   min-width: 0;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-top: 1px solid var(--im-border);
 }
 
@@ -582,7 +614,18 @@ summary:focus-visible,
 }
 
 .im-table-scroll {
+  container-type: inline-size;
   overflow-x: auto;
+}
+
+/* Narrow panel: keep the model input, its value and its contribution. */
+@container (max-width: 520px) {
+  .im-contributions th:nth-child(3),
+  .im-contributions td:nth-child(3),
+  .im-contributions th:nth-child(4),
+  .im-contributions td:nth-child(4) {
+    display: none;
+  }
 }
 
 .im-contributions,
@@ -743,6 +786,26 @@ summary:focus-visible,
 
 /* ---------------------------------------------------------------- narrow screens */
 
+/* Tablet and phone: the queue moves above the comparison (Streamlit itself
+   stacks columns only below 640px), shows a few rows and scrolls. */
+@media (max-width: 900px) {
+  [data-testid="stHorizontalBlock"]:has(.st-key-queue_column) > [data-testid="stColumn"] {
+    min-width: 100%;
+  }
+
+  [data-testid="stLayoutWrapper"]:has(> .st-key-queue_column) {
+    position: static;
+  }
+
+  .st-key-queue_list {
+    max-height: 272px;
+  }
+
+  .st-key-counts {
+    gap: 24px;
+  }
+}
+
 @media (max-width: 640px) {
   :root {
     --im-page-gutter: 16px;
@@ -762,19 +825,6 @@ summary:focus-visible,
 
   .im-empty {
     padding: 24px 16px;
-  }
-
-  .st-key-counts {
-    gap: 24px;
-  }
-
-  /* The queue sits above the comparison, so it shows a few rows and scrolls. */
-  [data-testid="stLayoutWrapper"]:has(> .st-key-queue_column) {
-    position: static;
-  }
-
-  .st-key-queue_list {
-    max-height: 272px;
   }
 
   .st-key-page_actions {

@@ -1,4 +1,7 @@
 [server]
+# Listen on this computer only: ledgers are financial data, so the app is not
+# offered to the rest of the network. Delete this line to host it for others.
+address = "localhost"
 enableStaticServing = true
 maxUploadSize = 5
 
