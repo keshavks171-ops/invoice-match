@@ -18,11 +18,11 @@ All vendors are fictional and appear nowhere else in the project.
 | Wrenfield Bus Lines, WB-7291 | Exact resubmission, but the vendor has three other $500.00 payments, so the right one must be picked |
 | St Olwen Parish Hall, 331 | "Saint" vs "St", and "Invoice #331" vs "331" |
 | Quillfeather Books, QF-5371 | Two digits transposed (paid as QF-5731) |
-| Larkspur Janitorial, LJ-0623 | Re-sent a month later by a vendor that also bills monthly |
+| Pruett Janitorial, PJ-0623 | Re-sent a month later by a vendor that also bills monthly |
 | Kestrelmoor Telecom, no reference | Statement copy with the reference left off; the real September bill is in the same batch |
 | Zephyr Lane Printing, 000731 | Past-due notice with a $25.00 late fee, so the amount differs |
 | Zephyr Lane Printing, 718 | Leading zeros dropped (paid as 000718) |
-| Ingrid Solheim Design, ISD-024-R1 | Revised invoice number, new date |
+| Sigrun Solheim Design, SSD-024-R1 | Revised invoice number, new date |
 | Oduya Bros. Moving & Storage LLC | Legal name vs trading name, resubmitted months later |
 | Okonkwo, Adaeze | No reference and no billing period on either side; the same tutor has legitimate sessions at the same fee |
 | Cafe Miraflor, 88213 | Accent and "#" dropped; another $640.00 order from the same caterer is legitimate |

@@ -1,0 +1,138 @@
+row_id,vendor,invoice_ref,amount,invoice_date,billing_period
+PAY-0001,Starboard Parade Embroidery,2497,183.09,2025-09-21,
+PAY-0002,DRIFTWOOD ROW CLEANING SERVICES CORP.,BILL-2360,55.00,2025-09-22,
+PAY-0003,Windmill Close Plumbing LLC,Inv-3674,161.64,2025-09-23,
+PAY-0004,FOGHORN DOCK AUDIO VISUAL,#7870,105.00,2025-09-23,
+PAY-0005,Starboard Parade Embroidery,2498,237.93,2025-09-24,
+PAY-0006,Sundial  Plaza Waste Services,,394.08,2025-09-24,2025-09
+PAY-0007,Foghorn Dock Audio Visual Company,INV-8771,295.44,2025-09-25,
+PAY-0008,"Quiroga, Marisol",4200,300.00,2025-09-27,2025-09
+PAY-0009,Lantern Street Storage,LS-20224,135.00,2025-10-01,2025-10
+PAY-0010,Anjali Deshmukh,2510-528,270.00,2025-10-03,2025-10
+PAY-0011,Anchor Mews Signs,005499,84.36,2025-10-07,
+PAY-0012,Marisol Quiroga,4022,165.00,2025-10-08,2025-10
+PAY-0013,Tidewater Loft Ins. Agcy,INV5167,36.35,2025-10-08,2025-10
+PAY-0014,Compass Yard Hardware,#2111,41.79,2025-10-09,
+PAY-0015,Beacon Alley Catering Incorporated,,191.93,2025-10-10,
+PAY-0016,Meridian  Pavilion Office Supply,MP-3849,90.00,2025-10-11,
+PAY-0017,Beacon Alley Catering Inc.,,106.81,2025-10-12,
+PAY-0018,Imogen Hartwell,,129.02,2025-10-13,
+PAY-0019,Marigold Wharf Property Management Co.,2510-832,192.70,2025-10-16,
+PAY-0020,Kingfisher Lane Web Hosting Corp.,2510952,93.72,2025-10-16,2025-10
+PAY-0021,Thimble Walk Art Supply,,803.84,2025-10-16,
+PAY-0022,Driftwood Row Cleaning Services Corp.,BILL-2361,55.00,2025-10-17,
+PAY-0023,Marisol Quiroga,4023,65.00,2025-10-17,2025-10
+PAY-0024,Windmill Close Plumbing LLC,Inv-3773,89.63,2025-10-18,
+PAY-0025,Seabright Arcade Florist Company,,545.91,2025-10-20,
+PAY-0026,M. Quiroga,4025,355.00,2025-10-24,2025-10
+PAY-0027,Sundial Plaza Waste Services L.L.C.,,433.58,2025-10-25,2025-10
+PAY-0028,Pelican Court Piano Tuning Inc.,1750,120.00,2025-10-27,
+PAY-0029,Tobias Lindgren,6272,235.00,2025-10-27,
+PAY-0030,Starboard Parade Embroidery,2499,339.08,2025-10-27,
+PAY-0031,Compass Yard Hardware,Inv-2112,19.90,2025-10-28,
+PAY-0032,ANJALI DESHMUKH,2511-529,120.00,2025-11-01,2025-11
+PAY-0033,Lantern Street Storage,LS-20261,135.00,2025-11-01,2025-11
+PAY-0034,Pinecone Steps Bakery Inc.,000374,97.25,2025-11-01,
+PAY-0035,Tobias Lindgren,6274,85.00,2025-11-02,
+PAY-0036,Anjali  Deshmukh,,65.00,2025-11-02,2025-11
+PAY-0037,Meridian Pavilion Office Supply Corp,,370.00,2025-11-05,
+PAY-0038,Compass Yard Hardware Co,#2115,146.90,2025-11-06,
+PAY-0039,Compass  Yard Hardware,Inv 2113,301.45,2025-11-06,
+PAY-0040,Foghorn Dock Audio Visual Co.,INV-7872,463.47,2025-11-07,
+PAY-0041,STARBOARD PARADE EMBROIDERY,2500,293.01,2025-11-08,
+PAY-0042,Tidewater Loft Insurance Agency,,35.07,2025-11-09,2025-11
+PAY-0043,Starboard Parade Embroidery Co,#2501,131.47,2025-11-09,
+PAY-0044,"Quiroga, Marisol",4026,155.00,2025-11-11,2025-11
+PAY-0045,M.P. Office Supply,MP-3851,65.10,2025-11-12,
+PAY-0046,Pelican Court Piano Tuning Inc.,PC-1753,120.00,2025-11-14,
+PAY-0047,O.C. Event Rentals,0987,312.00,2025-11-14,2025-11
+PAY-0048,"Kingfisher Lane Web Hosting, Corp.",2511-953,93.72,2025-11-17,2025-11
+PAY-0049,Marigold Wharf Property Management Co,2511-833,192.70,2025-11-18,2025-10
+PAY-0050,Starboard Parade Embroidery Co.,#2502,40.00,2025-11-18,
+PAY-0051,PELICAN COURT PIANO TUNING INC.,PC-1756,120.00,2025-11-21,
+PAY-0052,Tobias Lindgren,6275,215.00,2025-11-21,
+PAY-0053,Meridian Pavilion Office Supply Corp.,MP-3852,457.52,2025-11-21,
+PAY-0054,Sundial Plaza Waste Services L.L.C.,sp-3845,404.50,2025-11-23,2025-11
+PAY-0055,Imogen  Hartwell,,129.02,2025-11-24,
+PAY-0056,Compass Yard Hardware,Inv-2117,250.00,2025-11-26,
+PAY-0057,Starboard Parade Embroidery Co,2503,151.03,2025-11-28,
+PAY-0058,Thimble  Walk Art Supply,,16.51,2025-11-30,
+PAY-0059,SEABRIGHT ARCADE FLORIST CO.,2511-626,90.00,2025-11-30,
+PAY-0060,Lantern Street Storage,LS-20298,135.00,2025-12-01,2025-12
+PAY-0061,Meridian Pavilion Office Supply,3853,677.71,2025-12-04,
+PAY-0062,Anchor Mews Signs,,287.67,2025-12-05,
+PAY-0063,Starboard Parade Embroidery,,165.00,2025-12-05,
+PAY-0064,Meridian Pavilion Office Supply,MP-3854,365.00,2025-12-07,
+PAY-0065,Anjali Deshmukh LLC,2512-531,170.45,2025-12-09,2025-12
+PAY-0066,Bayside Printing Co.,BP-7698,86.50,2025-12-09,
+PAY-0067,Tidewater Loft Insurance Agency,,34.55,2025-12-10,2025-12
+PAY-0068,Kofi Mensah Art Classes,002946,80.00,2025-12-11,
+PAY-0069,Kingfisher Lane Web Hosting Corp.,2512-954,93.72,2025-12-15,2025-12
+PAY-0070,Kofi Mensah Art Classes,INV 002951,80.00,2025-12-16,
+PAY-0071,Marigold Wharf Property Management Co.,INV-2512-834,192.70,2025-12-18,2025-11
+PAY-0072,Foghorn Dock Audio Visual,INV-7873,115.92,2025-12-19,
+PAY-0073,Meridian Pavilion Office Supply,MP-3855,565.97,2025-12-19,
+PAY-0074,Marisol Quiroga,4028,130.00,2025-12-26,
+PAY-0075,Sundial Plaza Waste Services,SP-3846,400.08,2025-12-27,2025-12
+PAY-0076,MP Office Supply,MP-3856,235.00,2025-12-29,
+PAY-0077,Seabright Arcade Florist Co.,#2512-641,1098.47,2025-12-30,
+PAY-0078,Kofi Mensah,002956,80.00,2025-12-30,
+PAY-0079,I. Hartwell,,129.02,2025-12-30,
+PAY-0080,Lantern Street Storage,LS-20339,135.00,2026-01-01,2026-01
+PAY-0081,Driftwood Row Cleaning Svcs Corp.,BILL-2362,55.00,2026-01-03,
+PAY-0082,COMPASS YARD HARDWARE,Inv-2120,965.74,2026-01-05,
+PAY-0083,"Anchor Mews Signs, LLC",005503,402.36,2026-01-05,
+PAY-0084,"Pelican Court Piano Tuning, Inc.",PC-1771,120.00,2026-01-05,
+PAY-0085,Pelican Court Piano Tuning Inc.,PC-1782,120.00,2026-01-07,
+PAY-0086,Tidewater Loft Insurance Agency,INV5175,44.68,2026-01-08,2026-01
+PAY-0087,Tobias Lindgren,6276,135.00,2026-01-10,
+PAY-0088,Pelican Court Piano Tuning Inc.,PC-1789,120.00,2026-01-12,
+PAY-0089,Windmill Close Plumbing LLC,Inv 3790,71.47,2026-01-13,
+PAY-0090,"Lindgren, Tobias",6278,825.00,2026-01-15,
+PAY-0091,Kingfisher Lane Web Hosting Corp,2601-956,93.72,2026-01-17,2026-01
+PAY-0092,Pelican  Court Piano Tuning Inc.,PC-1798,120.00,2026-01-17,
+PAY-0093,Marigold Wharf Property Management Co.,2601-835,192.70,2026-01-18,2025-12
+PAY-0094,Meridian Pavilion Office Supply,MP-3857,302.91,2026-01-18,
+PAY-0095,STARBOARD PARADE EMBROIDERY,No. 2505,58.83,2026-01-19,
+PAY-0096,Compass Yard Hardware,Inv-2121,65.00,2026-01-20,
+PAY-0097,Windmill Close Plumbing,,233.34,2026-01-20,
+PAY-0098,Pinecone Steps Bakery Inc,000377,25.26,2026-01-21,
+PAY-0099,Meridian Pavilion Office Supply Corporation,MP-3858,439.98,2026-01-21,
+PAY-0100,Starboard Parade Embroidery,2506,295.39,2026-01-21,
+PAY-0101,Thimble  Walk Art Supply,,195.61,2026-01-22,
+PAY-0102,Bayside Printing Co.,BP-7716,240.00,2026-01-22,
+PAY-0103,Driftwood Row Cleaning Services Corp.,bill-2363,55.00,2026-01-24,
+PAY-0104,Sundial Plaza Waste Services,SP-3848,527.60,2026-01-27,2026-01
+PAY-0105,Tobias Lindgren,6279,552.10,2026-01-27,
+PAY-0106,Compass Yard Hdwe,Inv-2122,151.30,2026-01-30,
+PAY-0107,Imogen Hartwell,,129.02,2026-01-31,
+PAY-0108,Lantern Street Storage,LS-20377,135.00,2026-02-01,2026-02
+PAY-0109,Meridian Pavilion Office Supply,#3859,150.74,2026-02-03,
+PAY-0110,STARBOARD PARADE EMBROIDERY,2507,41.51,2026-02-05,
+PAY-0111,Compass Yard Hardware,Inv 2124,164.60,2026-02-05,
+PAY-0112,Foghorn Dock Audio Visual Co,INV-7874,64.63,2026-02-06,
+PAY-0113,THIMBLE WALK ART SUPPLY,,30.69,2026-02-10,
+PAY-0114,Compass Yard Hardware Co,#2126,162.43,2026-02-10,
+PAY-0115,Imogen Hartwell,,129.02,2026-02-11,
+PAY-0116,Tidewater Loft Insurance Agency,INV5176,41.38,2026-02-12,2026-02
+PAY-0117,Starboard Parade Embroidery Company,2508,813.72,2026-02-13,
+PAY-0118,Marigold Wharf Property Management Co.,2602-836,192.70,2026-02-16,2026-01
+PAY-0119,Beacon Alley Catering,,110.78,2026-02-17,
+PAY-0120,Kingfisher Lane Web Hosting Corp.,,93.72,2026-02-18,2026-02
+PAY-0121,AM Signs,005504,314.86,2026-02-18,
+PAY-0122,Windmill Close Plumbing LLC,Inv-3817,121.51,2026-02-18,
+PAY-0123,I. Hartwell,,129.02,2026-02-19,
+PAY-0124,Beacon Alley Catering Inc.,,405.00,2026-02-20,
+PAY-0125,Bayside Printing Co.,BP-7731,125.00,2026-02-24,
+PAY-0126,"Compass Yard Hardware, Co.",Inv-2129,145.00,2026-02-26,
+PAY-0127,Thimble Walk Art Supply,,120.50,2026-02-26,
+PAY-0128,KOFI MENSAH,002960,80.00,2026-02-26,
+PAY-0129,Marisol  Quiroga,4030,140.00,2026-03-04,2026-03
+PAY-0130,Foghorn Dock Audio Visual,INV-7876,145.24,2026-03-05,
+PAY-0131,Imogen Hartwell,,129.02,2026-03-06,
+PAY-0132,O.C. Event Rentals,1042,468.20,2026-03-06,2026-03
+PAY-0133,Compass Yard Hardware,Inv-2131,101.76,2026-03-14,
+PAY-0134,"Quiroga, Marisol",4031,993.31,2026-03-15,2026-03
+PAY-0135,"Quiroga, Marisol",,248.86,2026-03-17,2026-03
+PAY-0136,Thimble  Walk Art Supply,,1193.03,2026-03-18,
+PAY-0137,Imogen Hartwell,,129.02,2026-03-19,

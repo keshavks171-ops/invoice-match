@@ -1,0 +1,644 @@
+{
+  "train": {
+    "seed": 20260,
+    "date_range": [
+      "2023-01-01",
+      "2024-08-31"
+    ],
+    "ledgers": [
+      {
+        "ledger_id": "TR001",
+        "fold": 1,
+        "run_date": "2024-04-19",
+        "incoming": 60,
+        "payments": 235,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR002",
+        "fold": 1,
+        "run_date": "2023-11-22",
+        "incoming": 60,
+        "payments": 251,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR003",
+        "fold": 1,
+        "run_date": "2024-01-30",
+        "incoming": 60,
+        "payments": 244,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR004",
+        "fold": 1,
+        "run_date": "2024-07-02",
+        "incoming": 60,
+        "payments": 232,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR005",
+        "fold": 1,
+        "run_date": "2024-05-26",
+        "incoming": 60,
+        "payments": 238,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR006",
+        "fold": 1,
+        "run_date": "2024-05-24",
+        "incoming": 60,
+        "payments": 249,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR007",
+        "fold": 2,
+        "run_date": "2023-08-02",
+        "incoming": 60,
+        "payments": 272,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR008",
+        "fold": 2,
+        "run_date": "2023-09-20",
+        "incoming": 60,
+        "payments": 233,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR009",
+        "fold": 2,
+        "run_date": "2023-12-13",
+        "incoming": 60,
+        "payments": 247,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR010",
+        "fold": 2,
+        "run_date": "2023-12-01",
+        "incoming": 60,
+        "payments": 272,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR011",
+        "fold": 2,
+        "run_date": "2023-12-10",
+        "incoming": 60,
+        "payments": 274,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR012",
+        "fold": 2,
+        "run_date": "2024-02-14",
+        "incoming": 60,
+        "payments": 273,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR013",
+        "fold": 3,
+        "run_date": "2024-07-26",
+        "incoming": 60,
+        "payments": 253,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR014",
+        "fold": 3,
+        "run_date": "2023-09-06",
+        "incoming": 60,
+        "payments": 253,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR015",
+        "fold": 3,
+        "run_date": "2023-10-25",
+        "incoming": 60,
+        "payments": 273,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR016",
+        "fold": 3,
+        "run_date": "2024-08-06",
+        "incoming": 60,
+        "payments": 268,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR017",
+        "fold": 3,
+        "run_date": "2024-05-14",
+        "incoming": 60,
+        "payments": 240,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR018",
+        "fold": 3,
+        "run_date": "2023-12-06",
+        "incoming": 60,
+        "payments": 228,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR019",
+        "fold": 4,
+        "run_date": "2024-02-06",
+        "incoming": 60,
+        "payments": 272,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR020",
+        "fold": 4,
+        "run_date": "2024-03-31",
+        "incoming": 60,
+        "payments": 274,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR021",
+        "fold": 4,
+        "run_date": "2023-10-09",
+        "incoming": 60,
+        "payments": 243,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR022",
+        "fold": 4,
+        "run_date": "2024-06-27",
+        "incoming": 60,
+        "payments": 276,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR023",
+        "fold": 4,
+        "run_date": "2023-09-11",
+        "incoming": 60,
+        "payments": 274,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR024",
+        "fold": 4,
+        "run_date": "2024-02-18",
+        "incoming": 60,
+        "payments": 252,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR025",
+        "fold": 5,
+        "run_date": "2024-03-09",
+        "incoming": 60,
+        "payments": 264,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR026",
+        "fold": 5,
+        "run_date": "2023-08-09",
+        "incoming": 60,
+        "payments": 241,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR027",
+        "fold": 5,
+        "run_date": "2023-09-03",
+        "incoming": 60,
+        "payments": 257,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR028",
+        "fold": 5,
+        "run_date": "2024-08-11",
+        "incoming": 60,
+        "payments": 230,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR029",
+        "fold": 5,
+        "run_date": "2023-08-28",
+        "incoming": 60,
+        "payments": 258,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR030",
+        "fold": 5,
+        "run_date": "2023-08-08",
+        "incoming": 60,
+        "payments": 241,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR031",
+        "fold": 6,
+        "run_date": "2024-03-12",
+        "incoming": 60,
+        "payments": 262,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR032",
+        "fold": 6,
+        "run_date": "2024-06-18",
+        "incoming": 60,
+        "payments": 245,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR033",
+        "fold": 6,
+        "run_date": "2024-03-05",
+        "incoming": 60,
+        "payments": 273,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR034",
+        "fold": 6,
+        "run_date": "2024-04-08",
+        "incoming": 60,
+        "payments": 266,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR035",
+        "fold": 6,
+        "run_date": "2024-04-14",
+        "incoming": 60,
+        "payments": 253,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR036",
+        "fold": 6,
+        "run_date": "2024-08-30",
+        "incoming": 60,
+        "payments": 235,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR037",
+        "fold": 7,
+        "run_date": "2023-09-20",
+        "incoming": 60,
+        "payments": 238,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR038",
+        "fold": 7,
+        "run_date": "2024-03-19",
+        "incoming": 60,
+        "payments": 254,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR039",
+        "fold": 7,
+        "run_date": "2024-04-02",
+        "incoming": 60,
+        "payments": 249,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR040",
+        "fold": 7,
+        "run_date": "2023-11-13",
+        "incoming": 60,
+        "payments": 263,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR041",
+        "fold": 7,
+        "run_date": "2023-10-16",
+        "incoming": 60,
+        "payments": 250,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR042",
+        "fold": 7,
+        "run_date": "2024-03-26",
+        "incoming": 60,
+        "payments": 251,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR043",
+        "fold": 8,
+        "run_date": "2023-11-13",
+        "incoming": 60,
+        "payments": 244,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR044",
+        "fold": 8,
+        "run_date": "2023-08-10",
+        "incoming": 60,
+        "payments": 238,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR045",
+        "fold": 8,
+        "run_date": "2024-03-10",
+        "incoming": 60,
+        "payments": 248,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR046",
+        "fold": 8,
+        "run_date": "2024-03-23",
+        "incoming": 60,
+        "payments": 270,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR047",
+        "fold": 8,
+        "run_date": "2024-07-25",
+        "incoming": 60,
+        "payments": 251,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR048",
+        "fold": 8,
+        "run_date": "2024-01-12",
+        "incoming": 60,
+        "payments": 268,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR049",
+        "fold": 9,
+        "run_date": "2024-04-26",
+        "incoming": 60,
+        "payments": 259,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR050",
+        "fold": 9,
+        "run_date": "2024-04-19",
+        "incoming": 60,
+        "payments": 271,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR051",
+        "fold": 9,
+        "run_date": "2023-12-31",
+        "incoming": 60,
+        "payments": 252,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR052",
+        "fold": 9,
+        "run_date": "2024-06-30",
+        "incoming": 60,
+        "payments": 230,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR053",
+        "fold": 9,
+        "run_date": "2024-06-24",
+        "incoming": 60,
+        "payments": 275,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR054",
+        "fold": 9,
+        "run_date": "2024-06-04",
+        "incoming": 60,
+        "payments": 255,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR055",
+        "fold": 10,
+        "run_date": "2023-11-11",
+        "incoming": 60,
+        "payments": 241,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR056",
+        "fold": 10,
+        "run_date": "2023-10-04",
+        "incoming": 60,
+        "payments": 233,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR057",
+        "fold": 10,
+        "run_date": "2023-10-01",
+        "incoming": 60,
+        "payments": 239,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR058",
+        "fold": 10,
+        "run_date": "2024-06-22",
+        "incoming": 60,
+        "payments": 241,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TR059",
+        "fold": 10,
+        "run_date": "2023-11-04",
+        "incoming": 60,
+        "payments": 235,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TR060",
+        "fold": 10,
+        "run_date": "2024-08-20",
+        "incoming": 60,
+        "payments": 275,
+        "duplicates": 3
+      }
+    ]
+  },
+  "validation": {
+    "seed": 20260,
+    "date_range": [
+      "2024-09-01",
+      "2025-06-30"
+    ],
+    "ledgers": [
+      {
+        "ledger_id": "VA001",
+        "fold": 1,
+        "run_date": "2025-04-22",
+        "incoming": 60,
+        "payments": 264,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA002",
+        "fold": 1,
+        "run_date": "2025-04-18",
+        "incoming": 60,
+        "payments": 262,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA003",
+        "fold": 1,
+        "run_date": "2025-06-27",
+        "incoming": 60,
+        "payments": 270,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA004",
+        "fold": 1,
+        "run_date": "2025-04-12",
+        "incoming": 60,
+        "payments": 229,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA005",
+        "fold": 1,
+        "run_date": "2025-05-06",
+        "incoming": 60,
+        "payments": 244,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA006",
+        "fold": 1,
+        "run_date": "2025-04-17",
+        "incoming": 60,
+        "payments": 252,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA007",
+        "fold": 2,
+        "run_date": "2025-04-23",
+        "incoming": 60,
+        "payments": 248,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA008",
+        "fold": 2,
+        "run_date": "2025-06-19",
+        "incoming": 60,
+        "payments": 230,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA009",
+        "fold": 2,
+        "run_date": "2025-05-06",
+        "incoming": 60,
+        "payments": 247,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA010",
+        "fold": 2,
+        "run_date": "2025-06-20",
+        "incoming": 60,
+        "payments": 273,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA011",
+        "fold": 2,
+        "run_date": "2025-04-02",
+        "incoming": 60,
+        "payments": 242,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA012",
+        "fold": 2,
+        "run_date": "2025-04-29",
+        "incoming": 60,
+        "payments": 257,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA013",
+        "fold": 3,
+        "run_date": "2025-05-17",
+        "incoming": 60,
+        "payments": 232,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA014",
+        "fold": 3,
+        "run_date": "2025-06-08",
+        "incoming": 60,
+        "payments": 231,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA015",
+        "fold": 3,
+        "run_date": "2025-05-19",
+        "incoming": 60,
+        "payments": 258,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA016",
+        "fold": 3,
+        "run_date": "2025-06-11",
+        "incoming": 60,
+        "payments": 252,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "VA017",
+        "fold": 3,
+        "run_date": "2025-05-24",
+        "incoming": 60,
+        "payments": 266,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "VA018",
+        "fold": 3,
+        "run_date": "2025-06-19",
+        "incoming": 60,
+        "payments": 262,
+        "duplicates": 3
+      }
+    ]
+  }
+}

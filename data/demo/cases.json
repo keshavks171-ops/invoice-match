@@ -1,0 +1,23 @@
+[
+  {
+    "key": "disguised_duplicate",
+    "title": "Disguised duplicate",
+    "incoming_id": "INC-0015",
+    "expected_payment_id": "PAY-0132",
+    "summary": "The same rental invoice arrives a second time. The vendor name and the reference are written differently, but the amount, the invoice date and the billing period are identical to a payment that was already made."
+  },
+  {
+    "key": "recurring_bill",
+    "title": "Legitimate recurring bill",
+    "incoming_id": "INC-0028",
+    "expected_payment_id": "PAY-0108",
+    "summary": "The March storage bill. It has the same vendor and the same amount as the bills paid in earlier months, but a new reference and a new billing period. That is what a normal monthly bill looks like."
+  },
+  {
+    "key": "ambiguous",
+    "title": "Ambiguous case",
+    "incoming_id": "INC-0013",
+    "expected_payment_id": "PAY-0125",
+    "summary": "A similarly named vendor bills the same amount 16 days after a paid invoice, with no reference and no billing period to compare. The records cannot settle whether this is a second bill for the same job, so a person has to check."
+  }
+]

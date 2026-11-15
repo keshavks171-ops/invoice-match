@@ -1,0 +1,33 @@
+row_id,vendor,invoice_ref,amount,invoice_date,billing_period
+INC-0001,Thimble Walk Art Supply,,80.00,2026-03-10,
+INC-0002,Foghorn Dock Audio Visual,INV-7876,145.24,2026-03-12,
+INC-0003,M.P. Office Supply,MP-3860,425.84,2026-02-25,
+INC-0004,Anchor Mews Signs,5506,406.50,2026-03-20,
+INC-0005,Kingfisher Lane Web Hosting Corp.,2603-962,93.72,2026-03-14,2026-03
+INC-0006,Marisol Quiroga,4029,504.05,2026-02-19,2026-02
+INC-0007,Starboard Parade Embroidery Co,2511,78.82,2026-02-28,
+INC-0008,Saltmarsh Circle Electric,Invoice 7638,248.66,2026-03-03,2026-03
+INC-0009,Seabright Arcade Florist Co.,No. 2603-653,578.49,2026-03-05,
+INC-0010,Larkfield Green Tent Rentals,LG-6790,63.32,2026-02-21,2026-02
+INC-0011,Pelican Court Piano Tuning Inc.,PC-1815,120.00,2026-03-16,
+INC-0012,Starboard Parade Embroidery,2509,388.19,2026-02-20,
+INC-0013,Bayside Print & Copy,,125.00,2026-03-12,
+INC-0014,"Starboard Parade Embroidery, Co.",#2510,198.45,2026-02-21,
+INC-0015,OC Event Rentals LLC,INV-1042,468.20,2026-03-06,2026-03
+INC-0016,C. Marchetti,,25.63,2026-03-13,
+INC-0017,"Thimble Walk Art Supply, Inc.",,1452.37,2026-03-08,
+INC-0018,Thimble Walk Art Supply,,501.91,2026-03-16,
+INC-0019,Kofi Mensah,020961,80.00,2026-03-13,
+INC-0020,Beacon Alley Catering Inc.,,93.92,2025-11-19,
+INC-0021,Sundial Plaza Waste Services,SP-3850,512.47,2026-02-24,2026-02
+INC-0022,Marigold Wharf Property Management,,192.70,2026-03-16,
+INC-0023,Meridian Pavilion Office Supply,,150.74,2026-02-03,
+INC-0024,Driftwood Row Cleaning Services Corp.,BILL2364,55.00,2026-02-20,
+INC-0025,Foghorn Dock Audio Visual Co,INV-7875,69.87,2026-03-02,
+INC-0026,Tidewater Loft Insurance Agency,,35.65,2026-03-08,2026-03
+INC-0027,Imogen Hartwell,,129.02,2026-03-07,
+INC-0028,Lantern Street Storage,LS-20418,135.00,2026-03-01,2026-03
+INC-0029,Compass Yard Hardware Co.,Inv-2118,200.87,2025-12-20,
+INC-0030,Anjali Deshmukh,No. 2512-532,275.00,2025-12-20,2025-12
+INC-0031,Compass Yard Hardware,Inv-2128,168.67,2026-02-25,
+INC-0032,Marisol Quiroga,4030,172.00,2026-03-19,2026-03
