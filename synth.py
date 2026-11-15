@@ -105,7 +105,9 @@ ORG_SECOND_WORDS = {
         "Landing", "Mill", "Forge", "Gate", "Park", "Heights", "Bluff", "Canyon", "Prairie", "Orchard",
         "Garden", "Square", "Commons", "Junction", "Station", "Terrace",
     ),
-    "validation": ("Vista", "Haven", "Dale", "Fork", "Bend", "Pass", "Mesa", "Shore", "Quarry", "Pond", "Knoll", "Trail"),
+    "validation": (
+        "Vista", "Haven", "Dale", "Fork", "Bend", "Pass", "Mesa", "Shore", "Quarry", "Pond", "Knoll", "Trail",
+    ),
     "test": ("Notch", "Moor", "Heath", "Vale", "Dell", "Fen", "Croft", "Reach", "Strand", "Peak", "Plains", "Pier"),
 }
 
@@ -756,10 +758,12 @@ def draft_invoices(cast: Cast, plan: LedgerPlan, n_duplicates: int, run_date: da
     arrivals += sibling_bills(cast, paid, run_date, rng)
     arrivals += stale_bills(cast, paid, plan.n_stale, run_date, rng)
     for vendor in cast.newcomers:
-        arrivals.append(arrival(vendor, "one_off", one_off_amount(vendor, rng), "legit_new_vendor", paid, run_date, rng))
+        amount = one_off_amount(vendor, rng)
+        arrivals.append(arrival(vendor, "one_off", amount, "legit_new_vendor", paid, run_date, rng))
     for _ in range(plan.n_incoming - n_duplicates - len(arrivals)):
         vendor = rng.choice(cast.one_off)
-        arrivals.append(arrival(vendor, "one_off", one_off_amount(vendor, rng), "legit_one_off", paid, run_date, rng))
+        amount = one_off_amount(vendor, rng)
+        arrivals.append(arrival(vendor, "one_off", amount, "legit_one_off", paid, run_date, rng))
     return history, arrivals
 
 

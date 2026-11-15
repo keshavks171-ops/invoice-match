@@ -1,0 +1,4071 @@
+{
+  "label": "Validation results, used for tuning. The benchmark is results/benchmark.json.",
+  "command": "python evaluate.py --stage validate --challenger",
+  "criterion": "Most correct matches at a review budget of 20, summed over the three validation folds. Ties go to the sum at budget 10, then the sum at budget 5, then the mean average precision over the folds (compared to 2 decimals), then the simpler setting: for the learned model fewer interaction terms and then a smaller C, for the fuzzy rule the one listed first in its grid.",
+  "budgets": [
+    5,
+    10,
+    20
+  ],
+  "default_budget": 20,
+  "datasets": {
+    "train": {
+      "ledgers": 60,
+      "incoming": 3600,
+      "prior_payments": 15181,
+      "known_duplicates": 200,
+      "date_start": "2023-02-03",
+      "date_end": "2024-08-30"
+    },
+    "validation": {
+      "ledgers": 18,
+      "incoming": 1080,
+      "prior_payments": 4519,
+      "known_duplicates": 60,
+      "date_start": "2024-10-04",
+      "date_end": "2025-06-27"
+    }
+  },
+  "methods": {
+    "exact": {
+      "name": "Exact match",
+      "eligible": 25,
+      "mean_average_precision": 0.4166666666666667,
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 25,
+          "correct": 25,
+          "false_flags": 0,
+          "missed": 35,
+          "precision": 1.0,
+          "recall": 0.4166666666666667
+        },
+        "20": {
+          "reviews_used": 25,
+          "correct": 25,
+          "false_flags": 0,
+          "missed": 35,
+          "precision": 1.0,
+          "recall": 0.4166666666666667
+        }
+      },
+      "folds": {
+        "1": {
+          "eligible": 8,
+          "known_duplicates": 20,
+          "average_precision": 0.4,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 8,
+              "correct": 8,
+              "false_flags": 0,
+              "missed": 12,
+              "precision": 1.0,
+              "recall": 0.4
+            },
+            "20": {
+              "reviews_used": 8,
+              "correct": 8,
+              "false_flags": 0,
+              "missed": 12,
+              "precision": 1.0,
+              "recall": 0.4
+            }
+          }
+        },
+        "2": {
+          "eligible": 9,
+          "known_duplicates": 20,
+          "average_precision": 0.45,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 9,
+              "correct": 9,
+              "false_flags": 0,
+              "missed": 11,
+              "precision": 1.0,
+              "recall": 0.45
+            },
+            "20": {
+              "reviews_used": 9,
+              "correct": 9,
+              "false_flags": 0,
+              "missed": 11,
+              "precision": 1.0,
+              "recall": 0.45
+            }
+          }
+        },
+        "3": {
+          "eligible": 8,
+          "known_duplicates": 20,
+          "average_precision": 0.4,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 8,
+              "correct": 8,
+              "false_flags": 0,
+              "missed": 12,
+              "precision": 1.0,
+              "recall": 0.4
+            },
+            "20": {
+              "reviews_used": 8,
+              "correct": 8,
+              "false_flags": 0,
+              "missed": 12,
+              "precision": 1.0,
+              "recall": 0.4
+            }
+          }
+        }
+      }
+    },
+    "fuzzy": {
+      "name": "Fuzzy rule",
+      "eligible": 359,
+      "mean_average_precision": 0.7453487735525764,
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 29,
+          "false_flags": 1,
+          "missed": 31,
+          "precision": 0.9666666666666667,
+          "recall": 0.48333333333333334
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 43,
+          "false_flags": 17,
+          "missed": 17,
+          "precision": 0.7166666666666667,
+          "recall": 0.7166666666666667
+        }
+      },
+      "folds": {
+        "1": {
+          "eligible": 120,
+          "known_duplicates": 20,
+          "average_precision": 0.7360735976642657,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 10,
+              "false_flags": 0,
+              "missed": 10,
+              "precision": 1.0,
+              "recall": 0.5
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 14,
+              "false_flags": 6,
+              "missed": 6,
+              "precision": 0.7,
+              "recall": 0.7
+            }
+          }
+        },
+        "2": {
+          "eligible": 115,
+          "known_duplicates": 20,
+          "average_precision": 0.7526725589225589,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 10,
+              "false_flags": 0,
+              "missed": 10,
+              "precision": 1.0,
+              "recall": 0.5
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 14,
+              "false_flags": 6,
+              "missed": 6,
+              "precision": 0.7,
+              "recall": 0.7
+            }
+          }
+        },
+        "3": {
+          "eligible": 124,
+          "known_duplicates": 20,
+          "average_precision": 0.7473001640709044,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 9,
+              "false_flags": 1,
+              "missed": 11,
+              "precision": 0.9,
+              "recall": 0.45
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 15,
+              "false_flags": 5,
+              "missed": 5,
+              "precision": 0.75,
+              "recall": 0.75
+            }
+          }
+        }
+      }
+    },
+    "learned": {
+      "name": "Learned model",
+      "eligible": 1080,
+      "mean_average_precision": 0.8716999526586995,
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 49,
+          "false_flags": 11,
+          "missed": 11,
+          "precision": 0.8166666666666667,
+          "recall": 0.8166666666666667
+        }
+      },
+      "folds": {
+        "1": {
+          "eligible": 360,
+          "known_duplicates": 20,
+          "average_precision": 0.8500821467688938,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 10,
+              "false_flags": 0,
+              "missed": 10,
+              "precision": 1.0,
+              "recall": 0.5
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 16,
+              "false_flags": 4,
+              "missed": 4,
+              "precision": 0.8,
+              "recall": 0.8
+            }
+          }
+        },
+        "2": {
+          "eligible": 360,
+          "known_duplicates": 20,
+          "average_precision": 0.8733490829346093,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 10,
+              "false_flags": 0,
+              "missed": 10,
+              "precision": 1.0,
+              "recall": 0.5
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 16,
+              "false_flags": 4,
+              "missed": 4,
+              "precision": 0.8,
+              "recall": 0.8
+            }
+          }
+        },
+        "3": {
+          "eligible": 360,
+          "known_duplicates": 20,
+          "average_precision": 0.8916686282725955,
+          "results": {
+            "5": {
+              "reviews_used": 5,
+              "correct": 5,
+              "false_flags": 0,
+              "missed": 15,
+              "precision": 1.0,
+              "recall": 0.25
+            },
+            "10": {
+              "reviews_used": 10,
+              "correct": 10,
+              "false_flags": 0,
+              "missed": 10,
+              "precision": 1.0,
+              "recall": 0.5
+            },
+            "20": {
+              "reviews_used": 20,
+              "correct": 17,
+              "false_flags": 3,
+              "missed": 3,
+              "precision": 0.85,
+              "recall": 0.85
+            }
+          }
+        }
+      }
+    }
+  },
+  "frozen": {
+    "matcher": {
+      "vendor_text": "core",
+      "vendor_scorer": "token_sort_ratio",
+      "amount_transform": "log1p_cents",
+      "date_transform": "log1p_days",
+      "interactions": [],
+      "C": 0.03,
+      "class_weight": null
+    },
+    "fuzzy_rule": {
+      "vendor_threshold": 0.65,
+      "amount_rule": "exact",
+      "rank_by": "ref_then_vendor",
+      "vendor_scorer": "token_sort_ratio"
+    }
+  },
+  "error_analysis": {
+    "exact": {
+      "duplicates": {
+        "dup_exact_resubmission": {
+          "known": 15,
+          "caught": 8
+        },
+        "dup_late_fee": {
+          "known": 6,
+          "caught": 0
+        },
+        "dup_reissued_date": {
+          "known": 12,
+          "caught": 7
+        },
+        "dup_rekeyed": {
+          "known": 15,
+          "caught": 10
+        },
+        "dup_revised_ref": {
+          "known": 6,
+          "caught": 0
+        },
+        "dup_statement_no_ref": {
+          "known": 6,
+          "caught": 0
+        }
+      },
+      "false_flags": {}
+    },
+    "fuzzy": {
+      "duplicates": {
+        "dup_exact_resubmission": {
+          "known": 15,
+          "caught": 15
+        },
+        "dup_late_fee": {
+          "known": 6,
+          "caught": 0
+        },
+        "dup_reissued_date": {
+          "known": 12,
+          "caught": 9
+        },
+        "dup_rekeyed": {
+          "known": 15,
+          "caught": 15
+        },
+        "dup_revised_ref": {
+          "known": 6,
+          "caught": 0
+        },
+        "dup_statement_no_ref": {
+          "known": 6,
+          "caught": 4
+        }
+      },
+      "false_flags": {
+        "legit_same_amount_repeat": 13,
+        "legit_stale": 4
+      }
+    },
+    "learned": {
+      "duplicates": {
+        "dup_exact_resubmission": {
+          "known": 15,
+          "caught": 15
+        },
+        "dup_late_fee": {
+          "known": 6,
+          "caught": 5
+        },
+        "dup_reissued_date": {
+          "known": 12,
+          "caught": 9
+        },
+        "dup_rekeyed": {
+          "known": 15,
+          "caught": 15
+        },
+        "dup_revised_ref": {
+          "known": 6,
+          "caught": 0
+        },
+        "dup_statement_no_ref": {
+          "known": 6,
+          "caught": 5
+        }
+      },
+      "false_flags": {
+        "legit_one_off": 1,
+        "legit_same_amount_repeat": 8,
+        "legit_stale": 2
+      }
+    }
+  },
+  "slices": {
+    "vendor_kind": [
+      {
+        "group": "organization",
+        "legit_invoices": 713,
+        "known_duplicates": 37,
+        "methods": {
+          "exact": {
+            "legit_flagged": 0,
+            "duplicates_caught": 20
+          },
+          "fuzzy": {
+            "legit_flagged": 12,
+            "duplicates_caught": 27
+          },
+          "learned": {
+            "legit_flagged": 7,
+            "duplicates_caught": 31
+          }
+        }
+      },
+      {
+        "group": "individual",
+        "legit_invoices": 307,
+        "known_duplicates": 23,
+        "methods": {
+          "exact": {
+            "legit_flagged": 0,
+            "duplicates_caught": 5
+          },
+          "fuzzy": {
+            "legit_flagged": 5,
+            "duplicates_caught": 16
+          },
+          "learned": {
+            "legit_flagged": 4,
+            "duplicates_caught": 18
+          }
+        }
+      }
+    ]
+  },
+  "learned_search": [
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8717
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8374
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.1,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8715
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.1,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8361
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.3,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8708
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.3,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8347
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 1.0,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8714
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 1.0,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8355
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 3.0,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8712
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 3.0,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8346
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 10.0,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.871
+    },
+    {
+      "sweep": 1,
+      "coordinate": "C and class_weight",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 10.0,
+        "class_weight": "balanced"
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 45
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.835
+    },
+    {
+      "sweep": 1,
+      "coordinate": "vendor_text",
+      "setting": {
+        "vendor_text": "basic",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8734
+    },
+    {
+      "sweep": 1,
+      "coordinate": "vendor_scorer",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8737
+    },
+    {
+      "sweep": 1,
+      "coordinate": "vendor_scorer",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_set_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 48
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8704
+    },
+    {
+      "sweep": 1,
+      "coordinate": "vendor_scorer",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "WRatio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8742
+    },
+    {
+      "sweep": 1,
+      "coordinate": "amount_transform",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "relative",
+        "date_transform": "log1p_days",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 48
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8596
+    },
+    {
+      "sweep": 1,
+      "coordinate": "date_transform",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "capped_90",
+        "interactions": [],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 48
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.862
+    },
+    {
+      "sweep": 1,
+      "coordinate": "interactions",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [
+          "ref_exact*amount_exact",
+          "ref_exact*date_gap"
+        ],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8732
+    },
+    {
+      "sweep": 1,
+      "coordinate": "interactions",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [
+          "amount_exact*period_same",
+          "amount_exact*period_different"
+        ],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 47
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8565
+    },
+    {
+      "sweep": 1,
+      "coordinate": "interactions",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [
+          "vendor_fuzzy*amount_exact",
+          "vendor_fuzzy*ref_exact"
+        ],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 49
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8712
+    },
+    {
+      "sweep": 1,
+      "coordinate": "interactions",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [
+          "ref_exact*amount_exact",
+          "ref_exact*date_gap",
+          "amount_exact*period_same",
+          "amount_exact*period_different"
+        ],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 48
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8651
+    },
+    {
+      "sweep": 1,
+      "coordinate": "interactions",
+      "setting": {
+        "vendor_text": "core",
+        "vendor_scorer": "token_sort_ratio",
+        "amount_transform": "log1p_cents",
+        "date_transform": "log1p_days",
+        "interactions": [
+          "ref_exact*amount_exact",
+          "ref_exact*date_gap",
+          "amount_exact*period_same",
+          "amount_exact*period_different",
+          "vendor_fuzzy*amount_exact",
+          "vendor_fuzzy*ref_exact"
+        ],
+        "C": 0.03,
+        "class_weight": null
+      },
+      "correct": {
+        "5": 15,
+        "10": 30,
+        "20": 46
+      },
+      "eligible": 1080,
+      "mean_average_precision": 0.8578
+    }
+  ],
+  "fuzzy_search": [
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 318,
+      "mean_average_precision": 0.56
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 320,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 322,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 332,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 340,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 346,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 351,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 357,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 39
+      },
+      "eligible": 318,
+      "mean_average_precision": 0.6824
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 39
+      },
+      "eligible": 320,
+      "mean_average_precision": 0.685
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 322,
+      "mean_average_precision": 0.7022
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 332,
+      "mean_average_precision": 0.7022
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 340,
+      "mean_average_precision": 0.7022
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 346,
+      "mean_average_precision": 0.72
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 351,
+      "mean_average_precision": 0.7301
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 357,
+      "mean_average_precision": 0.7301
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 347,
+      "mean_average_precision": 0.558
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 349,
+      "mean_average_precision": 0.5601
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 351,
+      "mean_average_precision": 0.5601
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 361,
+      "mean_average_precision": 0.5601
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 370,
+      "mean_average_precision": 0.5601
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 377,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 383,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 392,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 39
+      },
+      "eligible": 347,
+      "mean_average_precision": 0.6809
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 39
+      },
+      "eligible": 349,
+      "mean_average_precision": 0.6831
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 351,
+      "mean_average_precision": 0.7003
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 361,
+      "mean_average_precision": 0.7003
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 370,
+      "mean_average_precision": 0.7003
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 377,
+      "mean_average_precision": 0.7181
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 383,
+      "mean_average_precision": 0.7286
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 392,
+      "mean_average_precision": 0.7286
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 358,
+      "mean_average_precision": 0.5578
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.5598
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.5598
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 372,
+      "mean_average_precision": 0.5598
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 383,
+      "mean_average_precision": 0.5598
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 390,
+      "mean_average_precision": 0.562
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 396,
+      "mean_average_precision": 0.562
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.562
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 39
+      },
+      "eligible": 358,
+      "mean_average_precision": 0.6756
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 39
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.6778
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.6951
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 372,
+      "mean_average_precision": 0.6951
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 383,
+      "mean_average_precision": 0.6951
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 41
+      },
+      "eligible": 390,
+      "mean_average_precision": 0.7115
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 42
+      },
+      "eligible": 396,
+      "mean_average_precision": 0.7209
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 42
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.7209
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 325,
+      "mean_average_precision": 0.5764
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 326,
+      "mean_average_precision": 0.5764
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 328,
+      "mean_average_precision": 0.5764
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 338,
+      "mean_average_precision": 0.5764
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 349,
+      "mean_average_precision": 0.5786
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.5811
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 359,
+      "mean_average_precision": 0.5811
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 361,
+      "mean_average_precision": 0.5811
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 325,
+      "mean_average_precision": 0.6983
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 326,
+      "mean_average_precision": 0.6983
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 328,
+      "mean_average_precision": 0.7154
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 338,
+      "mean_average_precision": 0.7154
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 349,
+      "mean_average_precision": 0.7179
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.7355
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 359,
+      "mean_average_precision": 0.7453
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 361,
+      "mean_average_precision": 0.7453
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 354,
+      "mean_average_precision": 0.5745
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.5745
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 357,
+      "mean_average_precision": 0.5745
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.5745
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.5764
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 386,
+      "mean_average_precision": 0.5787
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 391,
+      "mean_average_precision": 0.5787
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 395,
+      "mean_average_precision": 0.5787
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 354,
+      "mean_average_precision": 0.6967
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.6967
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 357,
+      "mean_average_precision": 0.7138
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.7138
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.7161
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 386,
+      "mean_average_precision": 0.7337
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 391,
+      "mean_average_precision": 0.7439
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 395,
+      "mean_average_precision": 0.7439
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 366,
+      "mean_average_precision": 0.5742
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.5742
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 369,
+      "mean_average_precision": 0.5742
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.5742
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 391,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 400,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 410,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 366,
+      "mean_average_precision": 0.6919
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.6919
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 41
+      },
+      "eligible": 369,
+      "mean_average_precision": 0.709
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 41
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.709
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 41
+      },
+      "eligible": 391,
+      "mean_average_precision": 0.7112
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 42
+      },
+      "eligible": 400,
+      "mean_average_precision": 0.7276
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_sort_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 410,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 335,
+      "mean_average_precision": 0.5737
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 338,
+      "mean_average_precision": 0.5759
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 350,
+      "mean_average_precision": 0.5759
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 359,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.5784
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 335,
+      "mean_average_precision": 0.7067
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 338,
+      "mean_average_precision": 0.7091
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 350,
+      "mean_average_precision": 0.7263
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.7437
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 359,
+      "mean_average_precision": 0.7437
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.7437
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.7437
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.7437
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 365,
+      "mean_average_precision": 0.5718
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 368,
+      "mean_average_precision": 0.5738
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 382,
+      "mean_average_precision": 0.5738
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 388,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 393,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 394,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 396,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 397,
+      "mean_average_precision": 0.5761
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 365,
+      "mean_average_precision": 0.7056
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 368,
+      "mean_average_precision": 0.7078
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 382,
+      "mean_average_precision": 0.725
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 388,
+      "mean_average_precision": 0.7424
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 393,
+      "mean_average_precision": 0.7424
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 394,
+      "mean_average_precision": 0.7424
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 396,
+      "mean_average_precision": 0.7424
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 397,
+      "mean_average_precision": 0.7424
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 377,
+      "mean_average_precision": 0.5716
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 380,
+      "mean_average_precision": 0.5736
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 393,
+      "mean_average_precision": 0.5736
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 401,
+      "mean_average_precision": 0.5758
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.5758
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 408,
+      "mean_average_precision": 0.5758
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 411,
+      "mean_average_precision": 0.5758
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 33
+      },
+      "eligible": 412,
+      "mean_average_precision": 0.5758
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 377,
+      "mean_average_precision": 0.7013
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 380,
+      "mean_average_precision": 0.7034
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 42
+      },
+      "eligible": 393,
+      "mean_average_precision": 0.7206
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 401,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 406,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 408,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 411,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "token_set_ratio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 412,
+      "mean_average_precision": 0.7369
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 329,
+      "mean_average_precision": 0.5626
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 337,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 352,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 363,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 363,
+      "mean_average_precision": 0.5674
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 329,
+      "mean_average_precision": 0.7002
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 337,
+      "mean_average_precision": 0.7127
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 352,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 355,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 360,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 362,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 363,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "exact",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 363,
+      "mean_average_precision": 0.7473
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 358,
+      "mean_average_precision": 0.5604
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.5624
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 387,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 390,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 395,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 397,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 398,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 400,
+      "mean_average_precision": 0.5648
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 40
+      },
+      "eligible": 358,
+      "mean_average_precision": 0.6986
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 41
+      },
+      "eligible": 367,
+      "mean_average_precision": 0.7112
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 387,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 390,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 395,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 397,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 398,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_100_cents",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 29,
+        "20": 43
+      },
+      "eligible": 400,
+      "mean_average_precision": 0.7458
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 370,
+      "mean_average_precision": 0.5601
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.562
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 399,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 403,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 410,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 412,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 414,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 13,
+        "10": 27,
+        "20": 32
+      },
+      "eligible": 416,
+      "mean_average_precision": 0.5643
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.95,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 40
+      },
+      "eligible": 370,
+      "mean_average_precision": 0.6921
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.9,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 41
+      },
+      "eligible": 379,
+      "mean_average_precision": 0.7036
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.85,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 399,
+      "mean_average_precision": 0.7371
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.8,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 403,
+      "mean_average_precision": 0.7371
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.75,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 410,
+      "mean_average_precision": 0.7371
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.7,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 412,
+      "mean_average_precision": 0.7371
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.65,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 414,
+      "mean_average_precision": 0.7371
+    },
+    {
+      "setting": {
+        "vendor_threshold": 0.6,
+        "amount_rule": "within_1_percent",
+        "rank_by": "ref_then_vendor",
+        "vendor_scorer": "WRatio"
+      },
+      "correct": {
+        "5": 15,
+        "10": 28,
+        "20": 43
+      },
+      "eligible": 416,
+      "mean_average_precision": 0.7371
+    }
+  ],
+  "challenger": {
+    "evaluated": true,
+    "rule": "LightGBM replaces logistic regression only if it finds at least 3 more correct matches at budget 20, summed over the three validation folds, and is not worse at budget 10.",
+    "features": [
+      "vendor_tfidf_cosine",
+      "vendor_fuzzy",
+      "ref_similarity",
+      "ref_exact",
+      "ref_missing_incoming",
+      "ref_missing_payment",
+      "amount_exact",
+      "amount_diff",
+      "date_gap",
+      "period_same",
+      "period_different",
+      "period_missing_incoming",
+      "period_missing_payment"
+    ],
+    "candidates": [
+      {
+        "setting": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 7,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 50
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.9081
+      },
+      {
+        "setting": {
+          "n_estimators": 200,
+          "learning_rate": 0.05,
+          "num_leaves": 7,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 50
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.9087
+      },
+      {
+        "setting": {
+          "n_estimators": 200,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 51
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.8985
+      }
+    ],
+    "lightgbm": {
+      "setting": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "num_leaves": 15,
+        "min_child_weight": 1.0
+      },
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 51,
+          "false_flags": 9,
+          "missed": 9,
+          "precision": 0.85,
+          "recall": 0.85
+        }
+      },
+      "per_fold_correct_at_20": {
+        "1": 17,
+        "2": 16,
+        "3": 18
+      }
+    },
+    "logistic_regression": {
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 49,
+          "false_flags": 11,
+          "missed": 11,
+          "precision": 0.8166666666666667,
+          "recall": 0.8166666666666667
+        }
+      },
+      "per_fold_correct_at_20": {
+        "1": 16,
+        "2": 16,
+        "3": 17
+      }
+    },
+    "gain_at_20": 2,
+    "gain_at_10": 0,
+    "rule_triggered": false,
+    "decision": "The rule is not met. Logistic regression stays: it is simpler and every coefficient can be read."
+  }
+}

@@ -1,0 +1,823 @@
+/* Invoice Match - app.css
+   The one stylesheet of the app, loaded once in app.py (main).
+
+   Selectors use three kinds of hooks only:
+     [data-testid="st..."]  Streamlit's own stable test ids
+     .st-key-NAME           the class Streamlit adds to a widget or container created with key="NAME"
+     .im-*                  classes on the HTML that app.py writes itself
+
+   Spacing follows an 8px scale (4, 8, 12, 16, 24, 32). */
+
+:root {
+  --im-canvas: #F5F6F3;
+  --im-surface: #FFFFFF;
+  --im-ink: #14231E;
+  --im-muted: #52615B;
+  --im-border: #DCE4DF;
+  --im-primary: #155645;
+  --im-primary-tint: #EAF2EE;
+  --im-hover: #F4F7F5;
+  /* Evidence colours. Each pair has a text contrast of at least 4.5:1. */
+  --im-match-bg: #D9F0EA;
+  --im-match-ink: #0B5248;
+  --im-differ-bg: #FBE9C0;
+  --im-differ-ink: #6B4300;
+  --im-missing-bg: #ECEFED;
+  --im-missing-ink: #46544E;
+  --im-error-bg: #FBE7E3;
+  --im-error-ink: #7A1F14;
+  --im-error-border: #EFC3BA;
+  --im-radius: 8px;
+  --im-shadow: 0 1px 2px rgba(20, 35, 30, 0.05);
+  --im-page-width: 1280px;
+  --im-page-gutter: 32px;
+}
+
+/* ---------------------------------------------------------------- page frame */
+
+[data-testid="stMainBlockContainer"] {
+  max-width: var(--im-page-width);
+  margin: 0 auto;
+  padding: 80px var(--im-page-gutter) 64px;
+}
+
+/* Top bar: brand wordmark, then the two pages. */
+[data-testid="stHeader"] {
+  height: 56px;
+  background: var(--im-surface);
+  border-bottom: 1px solid var(--im-border);
+}
+
+[data-testid="stToolbar"] {
+  max-width: var(--im-page-width);
+  margin: 0 auto;
+  padding: 0 var(--im-page-gutter);
+}
+
+/* The wordmark is drawn at the start of the top bar, in the app's own font. */
+[data-testid="stToolbar"]::before {
+  content: "Invoice Match";
+  align-self: center;
+  margin-right: 24px;
+  color: var(--im-primary);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* On a narrow screen Streamlit folds the page links into a side menu and
+   shows a button to open it. The wordmark then follows that button. */
+[data-testid="stToolbar"]:has([data-testid="stExpandSidebarButton"])::before {
+  order: 1;
+  margin: 0 0 0 8px;
+}
+
+[data-testid="stToolbar"]:has([data-testid="stExpandSidebarButton"]) > div {
+  flex: none;
+  width: auto;
+}
+
+[data-testid="stTopNav"] {
+  padding-left: 0;
+}
+
+[data-testid="stTopNavLink"] {
+  border-radius: 6px;
+  color: var(--im-muted);
+  font-weight: 500;
+}
+
+[data-testid="stTopNavLink"][aria-current="page"] {
+  background: var(--im-primary-tint);
+  color: var(--im-ink);
+}
+
+/* ---------------------------------------------------------------- keyboard focus */
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+[data-testid="stNumberInputContainer"]:focus-within,
+[data-testid="stRadioGroup"] > div:has(input:focus-visible) {
+  outline: 2px solid var(--im-primary);
+  outline-offset: 2px;
+}
+
+/* Queue rows sit inside a scrolling box that would clip an outer ring. */
+.st-key-queue_list [data-testid="stRadioGroup"] > div:has(input:focus-visible) {
+  outline-offset: -3px;
+  border-radius: 6px;
+}
+
+/* ---------------------------------------------------------------- text */
+
+[data-testid="stMain"] h1 {
+  padding: 0 0 8px;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* Streamlit fades captions with opacity; a solid muted colour keeps the contrast above 4.5:1. */
+[data-testid="stCaptionContainer"] {
+  opacity: 1;
+  color: var(--im-muted);
+}
+
+[data-testid="stCaptionContainer"] p {
+  color: var(--im-muted);
+  font-size: 14px;
+}
+
+.im-queue-head h2,
+.im-panel-head h2,
+.im-empty h2 {
+  margin: 0;
+  padding: 0;
+  color: var(--im-ink);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+/* The headings of the two columns are equally tall, so the queue and the cards start level. */
+.im-queue-head,
+.im-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 16px;
+  min-height: 32px;
+}
+
+.im-queue-head p,
+.im-panel-head p {
+  margin: 0;
+  color: var(--im-muted);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- summary strip */
+
+.st-key-summary {
+  padding: 12px 24px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.st-key-counts {
+  gap: 40px;
+}
+
+/* The export hint sits where a field label would, right above its button. */
+.st-key-export_area {
+  gap: 4px;
+}
+
+[data-testid="stMetricLabel"] p {
+  color: var(--im-muted);
+  font-size: 13px;
+}
+
+[data-testid="stMetricValue"] {
+  color: var(--im-ink);
+  font-size: 28px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+[data-testid="stNumberInputField"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- review queue */
+
+/* The queue stays in view while the page scrolls through the comparison.
+   Streamlit wraps a keyed container in a layout wrapper; that wrapper is the
+   element that has room to move inside the column, so it is the sticky one. */
+[data-testid="stLayoutWrapper"]:has(> .st-key-queue_column) {
+  position: sticky;
+  top: 72px;
+}
+
+/* The list scrolls on its own and is sized to fit the window below the page head. */
+.st-key-queue_list {
+  max-height: max(320px, calc(100vh - 472px));
+  overflow-y: auto;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.st-key-queue_list [data-testid="stRadioGroup"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* One row: the option label (vendor and amount) and its caption (reference and status). */
+.st-key-queue_list [data-testid="stRadioGroup"] > div {
+  position: relative;
+  margin: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--im-border);
+}
+
+.st-key-queue_list [data-testid="stRadioGroup"] > div:last-child {
+  border-bottom: 0;
+}
+
+.st-key-queue_list [data-testid="stRadioGroup"] > div:hover {
+  background: var(--im-hover);
+}
+
+/* The selected row is sticky: when it is scrolled out of the list (or picked
+   by a demo case or by Next unreviewed) it stays pinned to the nearest edge,
+   so the list always shows which invoice is on screen. */
+.st-key-queue_list [data-testid="stRadioGroup"] > div[data-selected="true"] {
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background: var(--im-primary-tint);
+  box-shadow: inset 3px 0 0 var(--im-primary), 0 -1px 0 var(--im-border);
+}
+
+.st-key-queue_list [data-testid="stRadioOption"] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* The label's click area is stretched over the whole row, caption included. */
+.st-key-queue_list [data-testid="stRadioOption"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* The round marker is replaced by the row highlight. The real radio input
+   stays in the page (Streamlit hides it visually), so Tab and the arrow keys work. */
+.st-key-queue_list [data-testid="stRadioOption"] > div > div:first-child {
+  display: none;
+}
+
+.st-key-queue_list [data-testid="stRadioOption"] > div {
+  display: block;
+  padding: 0;
+}
+
+.st-key-queue_list [data-testid="stRadioOption"] p {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--im-ink);
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.st-key-queue_list [data-testid="stRadioOption"] strong {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.st-key-queue_list [data-testid="stRadioCaption"] {
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.st-key-queue_list [data-testid="stRadioCaption"] p {
+  color: var(--im-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* The badge of a recorded decision. Its colours come from the theme in
+   .streamlit/config.toml; the longer selector outranks Streamlit's own badge rule. */
+.st-key-queue_list [data-testid="stRadioCaption"] span.stMarkdownBadge {
+  margin-left: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12.5px !important;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- comparison cards */
+
+.im-panel-amount {
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.im-position-below {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--im-differ-bg);
+  border-radius: 6px;
+  color: var(--im-differ-ink) !important;
+  font-weight: 500;
+}
+
+/* The two cards share one grid so that labels, values and notes line up
+   row by row. Each card and each field borrows the rows of the outer grid
+   (subgrid). 16 rows = the card title + 5 fields x (label, value, note). */
+.im-compare-box,
+.im-verdict-box {
+  container-type: inline-size;
+}
+
+.im-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(16, auto);
+  column-gap: 16px;
+}
+
+.im-card {
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  min-width: 0;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  color: var(--im-ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.im-card-incoming .im-card-title {
+  color: var(--im-primary);
+}
+
+.im-row-id {
+  color: var(--im-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.im-field {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  min-width: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--im-border);
+}
+
+/* The label and, on the payment side, the evidence. The label is as tall as
+   the evidence pill, so both cards start their values on the same line. */
+.im-field-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: flex-start;
+  gap: 4px 8px;
+}
+
+.im-label {
+  color: var(--im-muted);
+  font-size: 13px;
+  line-height: 24px;
+}
+
+.im-value {
+  color: var(--im-ink);
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.im-field-amount .im-value {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.im-note {
+  color: var(--im-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Evidence: the colour always comes with the sentence. */
+.im-evidence {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.im-evidence-match {
+  background: var(--im-match-bg);
+  color: var(--im-match-ink);
+}
+
+.im-evidence-differ,
+.im-evidence-partial {
+  background: var(--im-differ-bg);
+  color: var(--im-differ-ink);
+}
+
+.im-evidence-missing {
+  background: var(--im-missing-bg);
+  color: var(--im-missing-ink);
+}
+
+/* Narrow panel: the cards stack and keep the same field order. */
+@container (max-width: 600px) {
+  .im-compare {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 16px;
+  }
+
+  .im-card,
+  .im-field {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+}
+
+/* ---------------------------------------------------------------- reasons and score */
+
+.im-verdict {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-reasons,
+.im-score {
+  padding: 16px 24px;
+}
+
+.im-score {
+  border-left: 1px solid var(--im-border);
+}
+
+.im-verdict h3,
+.im-decision-head h3 {
+  margin: 0;
+  padding: 0;
+  color: var(--im-ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.im-reasons section + section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--im-border);
+}
+
+.im-reasons ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.im-reasons li,
+.im-reasons p {
+  margin: 4px 0 0;
+  color: var(--im-ink);
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.im-reasons li::marker {
+  color: var(--im-muted);
+}
+
+.im-score-value {
+  margin: 4px 0 0;
+  color: var(--im-ink);
+  font-size: 36px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.im-score-caption {
+  margin: 4px 0 0;
+  color: var(--im-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@container (max-width: 600px) {
+  .im-verdict {
+    grid-template-columns: 1fr;
+  }
+
+  .im-score {
+    border-left: 0;
+    border-top: 1px solid var(--im-border);
+  }
+}
+
+/* ---------------------------------------------------------------- decision */
+
+.st-key-decision_card {
+  padding: 16px 24px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-decision-head p {
+  margin: 4px 0 0;
+  color: var(--im-muted);
+  font-size: 14px;
+}
+
+/* Undo and Next unreviewed sit at the far end of the row of decisions. */
+.st-key-undo {
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------------- model details */
+
+[data-testid="stExpander"] details {
+  background: var(--im-surface);
+  border-color: var(--im-border);
+  border-radius: var(--im-radius);
+}
+
+.im-table-scroll {
+  overflow-x: auto;
+}
+
+.im-contributions,
+.im-schema {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--im-ink);
+  font-size: 14px;
+}
+
+.im-contributions th,
+.im-contributions td,
+.im-schema th,
+.im-schema td {
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--im-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.im-contributions thead th,
+.im-schema thead th {
+  color: var(--im-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.im-contributions tbody th,
+.im-contributions tfoot th {
+  font-weight: 500;
+}
+
+.im-contributions td,
+.im-contributions thead th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.im-contributions tfoot th,
+.im-contributions tfoot td {
+  font-weight: 650;
+}
+
+.im-contributions tfoot tr:last-child th,
+.im-contributions tfoot tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ---------------------------------------------------------------- empty states, notices, schema */
+
+.im-empty {
+  padding: 32px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-empty p {
+  max-width: 72ch;
+  margin: 8px 0 0;
+  color: var(--im-ink);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.im-empty > p:only-child {
+  margin: 0;
+}
+
+.im-empty .im-schema {
+  margin-top: 24px;
+}
+
+.im-schema caption {
+  padding: 0 12px 8px;
+  color: var(--im-muted);
+  font-size: 14px;
+  text-align: left;
+}
+
+.im-schema tbody th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.im-schema tbody tr:last-child th,
+.im-schema tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.im-empty code,
+.im-schema code,
+.im-help code {
+  padding: 2px 6px;
+  background: var(--im-missing-bg);
+  border-radius: 4px;
+  color: var(--im-ink);
+  font-size: 0.9em;
+}
+
+.im-help p {
+  margin: 0;
+  color: var(--im-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.im-help pre {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: 6px;
+  color: var(--im-ink);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.im-notice {
+  padding: 12px 16px;
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  background: var(--im-surface);
+  color: var(--im-ink);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.im-notice + .im-notice {
+  margin-top: 12px;
+}
+
+.im-notice-error {
+  background: var(--im-error-bg);
+  border-color: var(--im-error-border);
+  color: var(--im-error-ink);
+}
+
+.im-notice-title {
+  margin: 0;
+  font-weight: 650;
+}
+
+.im-notice ul {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+
+.im-notice li {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- narrow screens */
+
+@media (max-width: 640px) {
+  :root {
+    --im-page-gutter: 16px;
+  }
+
+  [data-testid="stMainBlockContainer"] {
+    padding-top: 72px;
+    padding-bottom: 48px;
+  }
+
+  .st-key-summary,
+  .st-key-decision_card,
+  .im-reasons,
+  .im-score {
+    padding: 12px 16px;
+  }
+
+  .im-empty {
+    padding: 24px 16px;
+  }
+
+  .st-key-counts {
+    gap: 24px;
+  }
+
+  /* The queue sits above the comparison, so it shows a few rows and scrolls. */
+  [data-testid="stLayoutWrapper"]:has(> .st-key-queue_column) {
+    position: static;
+  }
+
+  .st-key-queue_list {
+    max-height: 272px;
+  }
+
+  .st-key-page_actions {
+    justify-content: flex-start;
+  }
+
+  /* The schema table becomes a list: name and need on one line, the meaning below. */
+  .im-schema thead {
+    display: none;
+  }
+
+  .im-schema tr {
+    display: block;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--im-border);
+  }
+
+  .im-schema tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .im-schema th,
+  .im-schema td {
+    display: inline;
+    padding: 0;
+    border: 0;
+  }
+
+  .im-schema td:nth-child(2) {
+    margin-left: 8px;
+    color: var(--im-muted);
+  }
+
+  .im-schema td:last-child {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .im-schema caption {
+    padding: 0 0 8px;
+  }
+
+  .st-key-undo {
+    margin-left: 0;
+  }
+}

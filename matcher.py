@@ -586,35 +586,20 @@ class LearnedMatcher:
         truth set, else 0. Pairs are never formed across ledgers. The same
         ledgers and config always give the same model.
         """
-        sides = []
-        for ledger in ledgers:
-            if len(ledger.incoming) > 0 and len(ledger.payments) > 0:
-                incoming_side = _prepare_side(ledger.incoming, config.vendor_text)
-                payment_side = _prepare_side(ledger.payments, config.vendor_text)
-                sides.append((ledger, incoming_side, payment_side))
-        if not sides:
-            raise ValueError("LearnedMatcher.fit needs at least one ledger with invoices and payments.")
+        vectorizer, features, labels = training_pairs(ledgers, config)
+        return cls.fit_pairs(config, vectorizer, features, labels)
 
-        # The vectorizer learns its character n-grams from training vendor names only.
-        training_names = set()
-        for _ledger, incoming_side, payment_side in sides:
-            training_names.update(incoming_side.vendors.tolist())
-            training_names.update(payment_side.vendors.tolist())
-        vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 4)).fit(sorted(training_names))
+    @classmethod
+    def fit_pairs(cls, config: MatcherConfig, vectorizer: TfidfVectorizer,
+                  features: np.ndarray, labels: np.ndarray) -> "LearnedMatcher":
+        """Fit the scaler and the classifier on a training table made by training_pairs.
 
-        feature_blocks = []
-        label_blocks = []
-        for ledger, incoming_side, payment_side in sides:
-            incoming_side.vendor_vectors = vectorizer.transform(incoming_side.vendors)
-            payment_side.vendor_vectors = vectorizer.transform(payment_side.vendors)
-            cube = _pair_features(incoming_side, payment_side, config)
-            feature_blocks.append(cube.reshape(-1, cube.shape[2]))
-            label_blocks.append(_pair_labels(ledger).ravel())
-        features = np.vstack(feature_blocks)
-        labels = np.concatenate(label_blocks)
+        This is the second half of fit. It stands alone so that evaluate.py can
+        try several values of C and class_weight on one table instead of
+        building the same features again for each.
+        """
         if labels.min() == labels.max():
             raise ValueError("LearnedMatcher.fit needs both duplicate and non-duplicate pairs.")
-
         scaler = StandardScaler().fit(features)
         classifier = LogisticRegression(C=config.C, class_weight=config.class_weight, solver="lbfgs", max_iter=2000)
         classifier.fit(scaler.transform(features), labels)
@@ -686,6 +671,42 @@ class LearnedMatcher:
         })
         table.attrs["intercept"] = float(self.classifier.intercept_[0])
         return table
+
+
+def training_pairs(ledgers: Sequence[BenchLedger], config: MatcherConfig = DEFAULT_CONFIG,
+                   ) -> tuple[TfidfVectorizer, np.ndarray, np.ndarray]:
+    """The training table of the learned model: (vectorizer, features, labels).
+
+    The table has one row per incoming x payment pair inside each ledger;
+    pairs are never formed across ledgers. features has one column per name in
+    feature_names(config); labels holds 1 where the payment is in the incoming
+    invoice's truth set, else 0. The vectorizer learns its character n-grams
+    from the vendor names of these ledgers only.
+    """
+    sides = []
+    for ledger in ledgers:
+        if len(ledger.incoming) > 0 and len(ledger.payments) > 0:
+            incoming_side = _prepare_side(ledger.incoming, config.vendor_text)
+            payment_side = _prepare_side(ledger.payments, config.vendor_text)
+            sides.append((ledger, incoming_side, payment_side))
+    if not sides:
+        raise ValueError("LearnedMatcher.fit needs at least one ledger with invoices and payments.")
+
+    training_names = set()
+    for _ledger, incoming_side, payment_side in sides:
+        training_names.update(incoming_side.vendors.tolist())
+        training_names.update(payment_side.vendors.tolist())
+    vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 4)).fit(sorted(training_names))
+
+    feature_blocks = []
+    label_blocks = []
+    for ledger, incoming_side, payment_side in sides:
+        incoming_side.vendor_vectors = vectorizer.transform(incoming_side.vendors)
+        payment_side.vendor_vectors = vectorizer.transform(payment_side.vendors)
+        cube = _pair_features(incoming_side, payment_side, config)
+        feature_blocks.append(cube.reshape(-1, cube.shape[2]))
+        label_blocks.append(_pair_labels(ledger).ravel())
+    return vectorizer, np.vstack(feature_blocks), np.concatenate(label_blocks)
 
 
 def _pair_labels(ledger: BenchLedger) -> np.ndarray:

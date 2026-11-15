@@ -1,0 +1,242 @@
+{
+  "matcher": {
+    "vendor_text": "core",
+    "vendor_scorer": "token_sort_ratio",
+    "amount_transform": "log1p_cents",
+    "date_transform": "log1p_days",
+    "interactions": [],
+    "C": 0.03,
+    "class_weight": null
+  },
+  "fuzzy_rule": {
+    "vendor_threshold": 0.65,
+    "amount_rule": "exact",
+    "rank_by": "ref_then_vendor",
+    "vendor_scorer": "token_sort_ratio"
+  },
+  "selection": {
+    "criterion": "Most correct matches at a review budget of 20, summed over the three validation folds. Ties go to the sum at budget 10, then the sum at budget 5, then the mean average precision over the folds (compared to 2 decimals), then the simpler setting: for the learned model fewer interaction terms and then a smaller C, for the fuzzy rule the one listed first in its grid.",
+    "validation": {
+      "exact": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 25,
+          "correct": 25,
+          "false_flags": 0,
+          "missed": 35,
+          "precision": 1.0,
+          "recall": 0.4166666666666667
+        },
+        "20": {
+          "reviews_used": 25,
+          "correct": 25,
+          "false_flags": 0,
+          "missed": 35,
+          "precision": 1.0,
+          "recall": 0.4166666666666667
+        }
+      },
+      "fuzzy": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 29,
+          "false_flags": 1,
+          "missed": 31,
+          "precision": 0.9666666666666667,
+          "recall": 0.48333333333333334
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 43,
+          "false_flags": 17,
+          "missed": 17,
+          "precision": 0.7166666666666667,
+          "recall": 0.7166666666666667
+        }
+      },
+      "learned": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 49,
+          "false_flags": 11,
+          "missed": 11,
+          "precision": 0.8166666666666667,
+          "recall": 0.8166666666666667
+        }
+      }
+    }
+  },
+  "challenger": {
+    "evaluated": true,
+    "rule": "LightGBM replaces logistic regression only if it finds at least 3 more correct matches at budget 20, summed over the three validation folds, and is not worse at budget 10.",
+    "features": [
+      "vendor_tfidf_cosine",
+      "vendor_fuzzy",
+      "ref_similarity",
+      "ref_exact",
+      "ref_missing_incoming",
+      "ref_missing_payment",
+      "amount_exact",
+      "amount_diff",
+      "date_gap",
+      "period_same",
+      "period_different",
+      "period_missing_incoming",
+      "period_missing_payment"
+    ],
+    "candidates": [
+      {
+        "setting": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 7,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 50
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.9081
+      },
+      {
+        "setting": {
+          "n_estimators": 200,
+          "learning_rate": 0.05,
+          "num_leaves": 7,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 50
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.9087
+      },
+      {
+        "setting": {
+          "n_estimators": 200,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_child_weight": 1.0
+        },
+        "correct": {
+          "5": 15,
+          "10": 30,
+          "20": 51
+        },
+        "eligible": 1080,
+        "mean_average_precision": 0.8985
+      }
+    ],
+    "lightgbm": {
+      "setting": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "num_leaves": 15,
+        "min_child_weight": 1.0
+      },
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 51,
+          "false_flags": 9,
+          "missed": 9,
+          "precision": 0.85,
+          "recall": 0.85
+        }
+      },
+      "per_fold_correct_at_20": {
+        "1": 17,
+        "2": 16,
+        "3": 18
+      }
+    },
+    "logistic_regression": {
+      "summed": {
+        "5": {
+          "reviews_used": 15,
+          "correct": 15,
+          "false_flags": 0,
+          "missed": 45,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 30,
+          "correct": 30,
+          "false_flags": 0,
+          "missed": 30,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 60,
+          "correct": 49,
+          "false_flags": 11,
+          "missed": 11,
+          "precision": 0.8166666666666667,
+          "recall": 0.8166666666666667
+        }
+      },
+      "per_fold_correct_at_20": {
+        "1": 16,
+        "2": 16,
+        "3": 17
+      }
+    },
+    "gain_at_20": 2,
+    "gain_at_10": 0,
+    "rule_triggered": false,
+    "decision": "The rule is not met. Logistic regression stays: it is simpler and every coefficient can be read."
+  }
+}

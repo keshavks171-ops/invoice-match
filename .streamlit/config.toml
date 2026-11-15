@@ -19,6 +19,13 @@ linkColor = "#155645"
 font = "'Instrument Sans', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
 headingFont = "'Instrument Sans', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
 baseRadius = "8px"
+# Decision badges in the review queue (text on background, all above 4.5:1 contrast).
+orangeBackgroundColor = "#FBE9C0"
+orangeTextColor = "#6B4300"
+greenBackgroundColor = "#E1EEE7"
+greenTextColor = "#155645"
+blueBackgroundColor = "#E2E9F5"
+blueTextColor = "#27406B"
 
 [[theme.fontFaces]]
 family = "Instrument Sans"
