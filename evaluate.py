@@ -871,6 +871,17 @@ def challenge_report(ledgers: Sequence[BenchLedger], model: LearnedMatcher, rule
     }
 
 
+def print_benchmark(report: dict) -> None:
+    """Print the test table, and the challenge table when there is one. Counts only."""
+    dataset = report["dataset"]
+    print_summary(f"Held-out test split: {dataset['ledgers']} ledgers, {dataset['known_duplicates']} known duplicates",
+                  {method["key"]: method["results"] for method in report["methods"]}, BUDGETS)
+    challenge = report["challenge"]
+    if challenge is not None:
+        print_summary(f"Challenge set, reported separately: {challenge['budget']} known duplicates",
+                      {method["key"]: method["results"] for method in challenge["methods"]}, [challenge["budget"]])
+
+
 def run_test_stage(root: Path = PROJECT_ROOT) -> dict:
     """Score the frozen settings once on the held-out test split and write results/benchmark.json.
 
@@ -909,13 +920,7 @@ def run_test_stage(root: Path = PROJECT_ROOT) -> dict:
         "validation_summary": {key: validation[key][str(DEFAULT_BUDGET)] for key in METHOD_NAMES},
     }
     write_json(results_dir / "benchmark.json", report)
-
-    dataset = report["dataset"]
-    print_summary(f"Held-out test split: {dataset['ledgers']} ledgers, {dataset['known_duplicates']} known duplicates",
-                  {method["key"]: method["results"] for method in report["methods"]}, BUDGETS)
-    if challenge is not None:
-        print_summary(f"Challenge set (reported separately): {challenge['dataset']['known_duplicates']} known duplicates",
-                      {method["key"]: method["results"] for method in challenge["methods"]}, [challenge["budget"]])
+    print_benchmark(report)
     return report
 
 
