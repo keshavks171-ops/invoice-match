@@ -60,9 +60,11 @@ EXAMPLE_HEADER = "vendor,invoice_ref,amount,invoice_date,billing_period"
 EXAMPLE_ROW = "Lantern Street Storage,LS-20418,135.00,2026-03-01,2026-03"
 
 # 468.2   468.20   $1,234.50   1234      (not: 1e3, -5, 12.345, 12,50)
-_AMOUNT_PATTERN = re.compile(r"^\$?\s*(\d{1,3}(?:,\d{3})+|\d+)(\.\d{1,2})?$")
-_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_PERIOD_PATTERN = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
+# re.ASCII: only the digits 0-9 count, not look-alike digits from other scripts.
+_AMOUNT_PATTERN = re.compile(r"^\$?\s*(\d{1,3}(?:,\d{3})+|\d+)(\.\d{1,2})?$", re.ASCII)
+# Years 1900-2099 only: a typo such as 0226-03-01 is reported instead of accepted.
+_DATE_PATTERN = re.compile(r"^(19|20)\d{2}-\d{2}-\d{2}$", re.ASCII)
+_PERIOD_PATTERN = re.compile(r"^(19|20)\d{2}-(0[1-9]|1[0-2])$", re.ASCII)
 
 # Characters that make a spreadsheet treat a cell as a formula.
 _FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r", "\n")
@@ -180,7 +182,8 @@ def _decode(raw: bytes, name: str) -> str:
 def _parse_records(text: str, name: str) -> list[list[str]]:
     """Split the text into records with the standard csv module."""
     try:
-        return list(csv.reader(io.StringIO(text, newline="")))
+        # strict=True makes an unclosed double quote an error instead of swallowing the rest of the file.
+        return list(csv.reader(io.StringIO(text, newline=""), strict=True))
     except csv.Error:
         raise LedgerError(
             f"The {name} file could not be read as a CSV.",
@@ -224,7 +227,8 @@ def _read_header(records: list[list[str]], name: str) -> tuple[list[str], dict[s
 
 def _normalize_header(cell: str) -> str:
     """'Invoice Date ' -> 'invoice_date', so small header differences are forgiven."""
-    return re.sub(r"[\s\-]+", "_", cell.strip().lower())
+    visible = cell.replace("\ufeff", "").replace("\u200b", "")  # stray byte-order marks and zero-width spaces
+    return re.sub(r"[\s\-]+", "_", visible.strip().lower())
 
 
 def _read_rows(records: list[list[str]], header: list[str], positions: dict[str, int],

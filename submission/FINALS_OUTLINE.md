@@ -10,7 +10,7 @@ running with the demo loaded and the Benchmark page open in a second tab.
 | 0:00 – 0:40 | The user and the moment | A volunteer treasurer, the evening before a payment run, a spreadsheet of bills, nobody to double-check. Show the two $468.20 invoices: "Would you pay this twice?" |
 | 0:40 – 1:50 | Live demo | Load demo. Disguised duplicate: same amount, references match after normalization, same date and period. Record "Possible duplicate". Jump to the legitimate recurring bill: same vendor and amount, different reference and billing period. Jump to the ambiguous case: reference missing, record "Needs more information". Export the reviewed CSV. |
 | 1:50 – 2:50 | How it works | Every incoming invoice is compared with every prior payment: 13 pair features (TF-IDF character n-grams and RapidFuzz for vendor names, reference similarity and exact agreement, amount, date gap, billing period, missing flags) into logistic regression. Evidence sentences come from field comparisons, not from the model. Open "Model details" once. |
-| 2:50 – 4:00 | Did it beat a simple rule? | Benchmark page. 360 held-out invoices, 20 known duplicates, 20 reviews: exact match 8, tuned fuzzy rule 12, learned model 13. Say plainly: a clear win over exact match, a one-invoice lead over the fuzzy rule, which is within noise; validation was 49 vs 43 of 60, the hand-written challenge set 11 vs 9 of 12. Precision and recall, not accuracy. |
+| 2:50 – 4:00 | Did it beat a simple rule? | Benchmark page. 360 held-out invoices, 20 known duplicates, 20 reviews: exact match 8, tuned fuzzy rule 12, learned model 13. Say plainly: a clear win over exact match, a one-invoice lead over the fuzzy rule, which is within noise; validation was 49 vs 43 of 60, the separately authored challenge set 11 vs 9 of 12. Precision and recall, not accuracy. |
 | 4:00 – 4:40 | Where it fails | The re-sent invoice with a new number, ranked 23rd. Freelancers flagged more often than companies (4 of 93 vs 3 of 247). |
 | 4:40 – 5:00 | Limits and next step | Synthetic data, prototype, not financial advice. Next: a pilot on one nonprofit's permissioned ledger. |
 
@@ -39,14 +39,18 @@ simple rule.
 ## Q&A prep
 
 **How do you know test data did not leak into training?**
-Different vendor words per split, later dates per split, labels in separate files,
-features describe pairs only (no IDs, no single-row features). The test split did not
+Different vendor words per split, later dates per split, labels in separate files, and
+no IDs among the features. Nine features compare the two records; four are blank-field
+flags for one side, and the generator blanks fields with the same noise for duplicates
+and legitimate invoices. The test split did not
 exist on disk until the configuration was frozen. Tests check vendor-word disjointness
 and date order, and a formatting-only classifier is asserted to score at chance.
 
 **Your results look modest. Is the model worth it?**
 Against exact matching, yes: 13 vs 8. Against a rule I tuned on the same validation data
-with the same criterion, the test-set lead is one invoice. I report that as it is. The
+with the same criterion, the test-set lead is one invoice, and even a one-line rule
+(same amount, equal references first, closest date) finds 12 of 20. I report that as it
+is. The
 model's advantage shows on harder cases: it caught 5 of 6 late-fee duplicates on
 validation where the fuzzy rule caught none, because the rule requires equal amounts.
 
@@ -67,13 +71,13 @@ I wrote down first said switch only for a gain of 3 or more. I kept the model wh
 coefficients I can read and show to the treasurer.
 
 **What does a match score of 0.99 mean?**
-That the pair ranks very high, nothing more. It is a ranking score. The app caps the
-displayed value at 0.99 and says so. The reviewer always decides.
+That the pair ranks very high, nothing more. It is a ranking score. The app never prints more
+than 0.99, and the caption under it reads "A ranking score, not a probability." The reviewer always decides.
 
 **What are the limits of synthetic data?**
 I wrote the generator, so the benchmark tests the duplicates I imagined. Real ledgers
 have messier names, credit memos, partial payments and far fewer duplicates (ours are
-about 5.6% so the test is measurable), so real precision would be lower. The hand-written
+about 5.6% so the test is measurable), so real precision would be lower. The case-by-case
 challenge set is a small check outside the generator, not a substitute for real data.
 
 **How would a pilot measure real performance?**

@@ -1,7 +1,7 @@
 # Challenge set (hand-authored)
 
-A small extra ledger written by hand, one case at a time, without the random
-generator. It probes situations the generator may not cover and is **reported
+A small extra ledger authored case by case (with AI assistance), without the
+random generator. It probes situations the generator may not cover and is **reported
 separately** from the held-out synthetic benchmark. It was written before the
 test set was evaluated and was never used to fit or tune anything.
 

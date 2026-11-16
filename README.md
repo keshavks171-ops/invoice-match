@@ -14,7 +14,7 @@ blocks or pays anything.
 
 ## Quick start
 
-Python 3.11 or newer (developed on 3.13).
+Python 3.12 or newer (developed on 3.13).
 
 ```bash
 python -m venv .venv
@@ -37,8 +37,8 @@ demo ledger with the model's real scores (uploads need the app).
 ## Results (measured, synthetic benchmark)
 
 Held-out test set: **360 incoming invoices, 20 known duplicates**, 1,475 prior payments,
-6 ledgers, invoice dates 2025-08-04 to 2026-06-27. Its vendors and dates never appear in
-training or validation. Each method proposes one prior payment per incoming invoice and
+6 ledgers, invoice dates 2025-08-04 to 2026-06-27. Its vendor names never appear in
+training and its dates come after both earlier splits. Each method proposes one prior payment per incoming invoice and
 gets **20 reviews**. The test set was scored once, after every setting was frozen on
 validation.
 
@@ -55,11 +55,15 @@ slices of the same frozen rankings.
 
 **How to read it.** The learned model finds 5 more duplicates than exact matching. Its
 lead over the tuned fuzzy rule on the test set is a single invoice (13 vs 12), which a
-test set with 20 duplicates cannot tell apart from chance. On the three validation folds
-used for tuning (60 duplicates) the counts were 49, 43 and 25. Accuracy is not reported:
+test set with 20 duplicates cannot tell apart from chance. A one-line rule that ignores
+the vendor name (same amount; equal references first, then the closest date) also finds
+12 of 20. On the three validation folds used for tuning (60 duplicates) the counts were
+25 (exact match), 43 (fuzzy rule, and the same one-line rule) and 49 (learned model). So
+the model's measurable gain over simple rules is on validation and on the challenge set
+below, not on the test set. Accuracy is not reported:
 about 1 invoice in 18 is a duplicate, so "flag nothing" would be 94% accurate and useless.
 
-**Challenge set** (40 hand-written invoices, 12 known duplicates, reported separately,
+**Challenge set** (40 invoices authored case by case outside the generator, 12 known duplicates, reported separately,
 12 reviews): learned model 11, fuzzy rule 9, exact match 4.
 
 **One failure.** A $55.79 invoice from "CATALPA STRAND PRINTING" (INV-8103, 2026-01-21)
@@ -79,14 +83,18 @@ Reproduce everything (about 4 minutes):
 
 ```bash
 pip install -r requirements-dev.txt
-python synth.py --splits train validation test --demo   # regenerate the synthetic ledgers
-python evaluate.py --stage all --challenger              # tune on validation, freeze, score test
-python -m pytest                                         # 280+ tests
+python synth.py --splits train validation --demo    # training and validation ledgers, demo ledger
+python evaluate.py --stage validate --challenger    # tune on validation, freeze the settings
+python synth.py --splits test                       # generate the held-out split only now
+python evaluate.py --stage test                     # score the frozen settings once
+python -m pytest                                    # about 300 tests
 ```
 
 The files in `data/` and `results/` are the exact outputs of these commands.
 `results/benchmark.json` holds the table above; `results/validation.json` holds every
-setting that was tried.
+setting that was tried. Tests check that the train, validation and demo files and the
+validation numbers reproduce exactly; rerunning the test stage rewrites an identical
+`results/benchmark.json`.
 
 ## How it works
 
@@ -122,7 +130,7 @@ payments.csv ─┘   (validate)          └─ logistic regression (learned)  
 - *Exact match*: same vendor name, same non-blank reference and same amount.
 - *Fuzzy rule*: vendor names at least 65% similar and the same amount, ranked with equal
   references first. Its threshold, amount rule and ranking were tuned on validation with
-  the same criterion as the model (192 variants tried), so it is the strongest rule of its kind.
+  the same criterion as the model, so it is the best of the 192 variants tried.
 
 **Why logistic regression.** A LightGBM challenger on the same features found 51 of 60
 validation duplicates against 49. The rule written down beforehand required a gain of at
@@ -133,8 +141,9 @@ least 3, so the simpler model, whose every coefficient can be read, was kept.
 - **Split before pairing, by vendor and by time.** Train (60 ledgers, dates up to
   2024-08-30), validation (18 ledgers, 2024-10-04 to 2025-06-27) and test (6 ledgers,
   2025-08-04 onward) use different vendor words, so a vendor, its aliases and its
-  similarly named neighbours never cross a split. The model is trained on earlier dates
-  and tested on later ones.
+  similarly named neighbours never cross a split. One exception we found afterwards: a
+  two-letter initials alias, "SP Electric", occurs in both validation and test (nothing is
+  fitted on either). The model is trained on earlier dates and tested on later ones.
 - **Fit on train only.** The TF-IDF vocabulary, the scaler and the classifier see only
   the 910,860 training pairs (210 positive).
 - **Tune on validation only.** Model settings, the fuzzy rule and the LightGBM decision
@@ -143,8 +152,12 @@ least 3, so the simpler model, whose every coefficient can be read, was kept.
 - **Formatting cannot reveal the label.** Every record, duplicate or not, goes through
   the same noise (aliases, abbreviations, punctuation, reference prefixes, typos, missing
   fields). A classifier that sees only how a single row is formatted scores a ROC AUC
-  between 0.40 and 0.60, i.e. chance; `tests/test_synth.py` asserts this.
-- **No answer key in the inputs.** Features describe a pair of invoices only. Labels and
+  between 0.40 and 0.60, i.e. chance; `tests/test_synth.py` asserts this. One realistic
+  non-formatting cue remains: a re-sent invoice tends to carry an older date (invoice age
+  alone scores ROC AUC 0.74 on the test set). No method uses invoice age, and legitimately
+  late invoices are older still.
+- **No answer key in the inputs.** Features compare a pair of invoices, plus blank-field
+  flags for each side; no IDs. Labels and
   generator metadata live in separate `*_labels.csv` files.
 
 ### Evaluation rules
@@ -198,7 +211,7 @@ every file. A React + FastAPI build would have looked sharper but doubled the mo
 
 ## Known limitations
 
-- **Synthetic data.** We wrote the generator, so the benchmark measures how well the
+- **Synthetic data.** The generator is our own, so the benchmark measures how well the
   methods recover the kinds of duplicates we imagined. It says nothing about accuracy on
   a real ledger, about fraud, or about money saved.
 - **Duplicates are over-represented** (about 5.6% of invoices) so that 20 of them fit in
@@ -212,8 +225,8 @@ every file. A React + FastAPI build would have looked sharper but doubled the mo
 
 ## Credits
 
-- **Data:** all ledgers are synthetic, generated by `synth.py` or written by hand for
-  this project. No external dataset, no real invoices, no personal information.
+- **Data:** all ledgers are synthetic, generated by `synth.py` or authored case by case
+  (the challenge set, also with AI assistance) for this project. No external dataset, no real invoices, no personal information.
 - **Libraries:** [pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/),
   [scikit-learn](https://scikit-learn.org/) (`LogisticRegression`, `TfidfVectorizer`,
   `StandardScaler`), [RapidFuzz](https://github.com/rapidfuzz/RapidFuzz),
@@ -226,7 +239,7 @@ every file. A React + FastAPI build would have looked sharper but doubled the mo
   template); [OWASP: CSV Injection](https://owasp.org/www-community/attacks/CSV_Injection)
   for the export escaping. No tutorial code and no pretrained model were used.
 - **AI assistance:** [Claude](https://claude.ai/) (Anthropic), through Claude Code, was
-  used to write and test the code, generate the synthetic data and draft the documents,
-  working from the team's project specification. No AI model or API runs inside the app.
+  wrote and tested the code, generated the synthetic data and the challenge set, and
+  drafted the documents, working from the team's project specification and review. No AI model or API runs inside the app.
 
 All vendor names are invented; any resemblance to a real business is coincidental.

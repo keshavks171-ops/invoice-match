@@ -1,4 +1,4 @@
-# Invoice Match — runtime dependencies (Python 3.11+; developed on 3.13).
+# Invoice Match — runtime dependencies (Python 3.12+; developed on 3.13).
 # Exact pins so the benchmark reproduces bit-for-bit.
 pandas==3.1.1
 numpy==2.5.4

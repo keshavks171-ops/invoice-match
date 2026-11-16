@@ -5,44 +5,46 @@
 
 *This project is a prototype and is not financial advice.*
 
+**Takeaway:** with 20 reviews, a small readable model caught 13 of 20 duplicate invoices
+on unseen synthetic test data. Exact matching caught 8 and a tuned fuzzy rule 12, so its
+edge over a good rule is one invoice.
+
 ## The problem
 
 A volunteer treasurer at a small nonprofit pays bills in batches, often from a
 spreadsheet, with nobody to double-check. The same invoice can arrive twice: re-sent by
-email, re-typed with a different invoice number format, or followed by a past-due
-notice. Paying it twice costs money the organization cannot spare, and next month's
-legitimate bill from the same vendor looks almost identical to a duplicate.
+email, re-typed with a different number format, or followed by a past-due notice. Paying
+it twice costs money the organization cannot spare, and next month's legitimate bill
+from the same vendor looks almost identical to a duplicate.
 
 ## What we built
 
 **In:** two CSV files, incoming invoices and prior payments. **Out:** a review queue.
-A learned model ranks the incoming invoices by how strongly each one resembles a payment
-already made. The treasurer opens the top of the queue, sees the incoming invoice next to
-the prior payment with plain-language evidence ("Same amount", "References match after
-normalization", "Different billing period"), and records *Possible duplicate*,
-*Legitimate bill* or *Needs more information*. The model only ranks. The person decides.
+A learned model ranks the incoming invoices by how strongly each resembles a payment
+already made. The treasurer sees the invoice next to that payment with plain-language
+evidence ("Same amount", "References match after normalization", "Different billing
+period") and records *Possible duplicate*, *Legitimate bill* or *Needs more
+information*. The model only ranks. The person decides.
 
 ## What we added
 
 Our own idea. Our own user (a volunteer treasurer, the moment before a payment run), our
-own data (a synthetic ledger generator plus a hand-written challenge set), and our own
-questions: how many duplicates can be caught in only 20 reviews, and are freelancers'
-invoices held for review more often than companies'?
+own data (a synthetic ledger generator plus a challenge set authored case by case), and
+our own questions: how many duplicates can be caught in only 20 reviews, and are
+freelancers' invoices held for review more often than companies'?
 
 ## How it works
 
 **Data.** Synthetic ledgers with fictional vendors: recurring bills, round-dollar fees,
 similarly named vendors, missing fields and six kinds of duplicate. Every record passes
-through the same formatting noise, so formatting alone cannot reveal the label (a
-formatting-only classifier scores at chance). Train (60 ledgers), validation (18) and
-test (6) use different vendors and are ordered in time: we train on earlier dates and
-test on later ones.
+through the same formatting noise, so formatting alone cannot reveal the label. Train
+(60 ledgers), validation (18) and test (6) use different vendors and are ordered in
+time: we train on earlier dates and test on later ones.
 
 **Model.** scikit-learn logistic regression over 13 features of an invoice pair:
 character n-gram TF-IDF and RapidFuzz vendor similarity, invoice-reference similarity and
-exact agreement, amount difference, date gap, billing-period agreement, and missing-field
-flags. It is simple enough that every coefficient can be read. A LightGBM challenger
-gained too little on validation to justify replacing it.
+exact agreement, amount difference, date gap, billing-period agreement, and blank-field
+flags. Every coefficient can be read.
 
 ## Results
 
@@ -55,9 +57,10 @@ Held-out test set: 360 incoming invoices, 20 known duplicates. Each method gets 
 | Learned model | 20 | 13 | 7 | 7 | 65% | 65% |
 
 Our baselines scored 8 and 12 of 20; our model scored 13 of 20. It clearly beats exact
-matching. Its lead over the tuned fuzzy rule is one invoice, which a test set this small
-cannot separate from chance (validation: 49 vs 43 of 60; hand-written challenge set: 11
-vs 9 of 12).
+matching. Its lead over the fuzzy rule is one invoice, which a test set this small cannot
+separate from chance, and a one-line rule (same amount, equal references first) also
+finds 12. The gain is clearer on validation (49 vs 43 of 60) and on the challenge set
+(11 vs 9 of 12).
 
 **Where it fails.** A $55.79 printing invoice was re-sent 15 days later with a new
 invoice number. The model found the right payment but ranked it 23rd, outside the 20
@@ -65,8 +68,8 @@ reviews, because a new number on the same amount looks like the vendor's next bi
 also flagged legitimate invoices from freelancers more often than from companies (4 of
 93 vs 3 of 247), since freelancers repeat the same fee without invoice numbers.
 
-**Limits.** We wrote the data generator, so these numbers do not measure real-world
-accuracy, fraud detection or money saved.
+**Limits.** The data comes from our own generator, so these numbers do not measure
+real-world accuracy, fraud detection or money saved.
 
 ## What we'd do next
 
@@ -76,11 +79,12 @@ same amount) to tell a re-sent invoice from the next bill.
 
 ## Sources
 
-Data: synthetic, generated by our own code; no external dataset or pretrained model.
+Data: synthetic, from our own generator; no external dataset or pretrained model.
 Libraries: [scikit-learn](https://scikit-learn.org/), [RapidFuzz](https://github.com/rapidfuzz/RapidFuzz),
 [pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/), [Streamlit](https://streamlit.io/),
-[LightGBM](https://lightgbm.readthedocs.io/) (challenger only), [pytest](https://pytest.org/).
-Font: [Instrument Sans](https://github.com/Instrument/instrument-sans) (OFL).
+[LightGBM](https://lightgbm.readthedocs.io/) (challenger only), [pytest](https://pytest.org/),
+[Playwright](https://playwright.dev/) (screenshots). Font: [Instrument Sans](https://github.com/Instrument/instrument-sans) (OFL).
 Reference: [OWASP CSV Injection](https://owasp.org/www-community/attacks/CSV_Injection).
-AI tools: [Claude](https://claude.ai/) (Anthropic, via Claude Code) for coding, testing,
-synthetic data and drafting, from our own specification.
+AI tools: [Claude](https://claude.ai/) (Anthropic, via Claude Code) wrote and tested the
+code, generated the synthetic data and challenge set, and drafted this write-up, working
+from our project specification and review.

@@ -18,8 +18,10 @@ git push https://github.com/<your-account>/invoice-match.git invoice-match-only:
 
 - [ ] New public repository created and pushed (the README renders with the screenshots)
 - [ ] Opened the repository link in a private/incognito window: it loads without signing in
-- [ ] Fallback if you run out of time: make sure the existing repository is public and
-      submit the folder link `.../tree/claude/invoice-match-hackathon-74z2ld/invoice-match`
+- [ ] Last resort only: make the existing repository public and submit the folder link
+      `.../tree/claude/invoice-match-hackathon-74z2ld/invoice-match`. Its history shows a
+      personal email address and the earlier FinWise project, which works against blind
+      review and the build-during-the-weekend rule. Prefer the split repository
 
 ## 2. Write-up (required): about one page
 
@@ -39,7 +41,7 @@ required sentence "This project is a prototype and is not financial advice."
 - [ ] Every team member's name, email and school, spelled correctly (1 to 3 high school
       students; everyone listed must have contributed)
 - [ ] "What you added": our own idea; own user (volunteer treasurer), own synthetic data
-      and hand-written challenge set, own questions (duplicates caught in 20 reviews;
+      and a case-by-case challenge set, own questions (duplicates caught in 20 reviews;
       are freelancers flagged more often than companies)
 - [ ] Credits, with links (copy from the write-up's Sources): scikit-learn, RapidFuzz,
       pandas, NumPy, Streamlit, LightGBM (challenger only), pytest, Playwright, Instrument
@@ -50,7 +52,8 @@ required sentence "This project is a prototype and is not financial advice."
 
 ## 4. Demo video (optional, recommended): up to 2 minutes
 
-- [ ] Record with `submission/VIDEO_SCRIPT.md` (screen recording plus voice)
+- [ ] Record with `submission/VIDEO_SCRIPT.md` (screen recording plus voice). Say only
+      what is true for you; add your own nonprofit experience in your own words if you like
 - [ ] Upload to YouTube as Unlisted, or Google Drive with "anyone with the link can view"
 - [ ] Opened the link in a private window
 

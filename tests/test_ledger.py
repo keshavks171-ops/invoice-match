@@ -217,3 +217,37 @@ def test_safe_csv_round_trips_and_escapes_only_text_columns():
     assert rows[2] == ["Harbor Print, LLC", "000418", "10.00"]
     assert rows[3] == ["'+Plus Co", "'@ref", "5.00"]
     assert frame["vendor"].iloc[0].startswith("=")  # the caller's frame is not modified
+
+
+# ------------------------------------------------------- hardening regressions
+
+@pytest.mark.parametrize("text", ["0001-01-01", "1677-01-01", "2263-01-01", "9999-12-31", "0226-03-01"])
+def test_dates_outside_1900_to_2099_are_reported_not_crashed(text):
+    message = problems_of(f"vendor,amount,invoice_date\nVendor A,10.00,{text}\n")
+    assert "Row 2" in message and "YYYY-MM-DD" in message
+
+
+@pytest.mark.parametrize("text", ["0000-01", "9999-12", "\uff12\uff10\uff12\uff16-03"])
+def test_impossible_or_non_ascii_billing_periods_are_rejected(text):
+    message = problems_of(f"vendor,amount,invoice_date,billing_period\nVendor A,10.00,2026-03-06,{text}\n")
+    assert "billing_period" in message
+
+
+def test_non_ascii_digits_are_not_an_amount():
+    assert "amount" in problems_of("vendor,amount,invoice_date\nVendor A,\uff14\uff16\uff18.20,2026-03-06\n")
+
+
+def test_unclosed_quote_is_named_instead_of_swallowing_rows():
+    body = '"Vendor A,1,5.00,2026-03-01,\n' + "".join(f"V{i},{i},1.00,2026-03-02,\n" for i in range(5))
+    message = problems_of("vendor,invoice_ref,amount,invoice_date,billing_period\n" + body)
+    assert "unclosed double quote" in message
+
+
+def test_invisible_characters_in_the_header_are_ignored():
+    frame, _ = read("\ufeff\u200bvendor,amount,invoice_date\nVendor A,10.00,2026-03-06\n")
+    assert frame["vendor"].tolist() == ["Vendor A"]
+
+
+def test_boundary_dates_and_an_inch_mark_still_load():
+    frame, _ = read('vendor,amount,invoice_date\nHarbor 12" Print,10.00,1900-01-01\nB,1.00,2099-12-31\n')
+    assert len(frame) == 2

@@ -1010,7 +1010,8 @@ def validation_sentence(data: dict) -> str:
 def how_to_read_html(data: dict) -> str:
     """What the numbers on the page can and cannot say, and how to produce them again."""
     lines = [
-        "Results are measured on synthetic data. They are not a measure of real-world accuracy.",
+        "Results are measured on synthetic data. They are not a measure of real-world accuracy. "
+        "This project is a prototype and is not financial advice.",
         "The test set was scored once, after the settings were frozen on validation.",
         validation_sentence(data),
     ]
