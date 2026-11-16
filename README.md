@@ -233,6 +233,8 @@ every file. A React + FastAPI build would have looked sharper but doubled the mo
   [Streamlit](https://streamlit.io/), [LightGBM](https://lightgbm.readthedocs.io/)
   (challenger only), [pytest](https://pytest.org/), [Playwright](https://playwright.dev/)
   (browser checks and screenshots).
+- **Video music:** synthesized from sine waves by `submission/build_music.py`; no samples
+  or third-party audio.
 - **Font:** [Instrument Sans](https://github.com/Instrument/instrument-sans), SIL Open
   Font License 1.1 (`static/fonts/OFL-InstrumentSans.txt`).
 - **References:** the event's Project Briefs (rules, track requirements, write-up
