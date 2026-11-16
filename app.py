@@ -947,11 +947,8 @@ def example_html(example: dict) -> str:
 
 def record_line_html(title: str, record: dict) -> str:
     """One record on one line: vendor, reference, amount, invoice date and billing period."""
-    values = f" {MIDDLE_DOT} ".join(record_display(record).values())
-    return (
-        f'<p class="im-record-line"><span class="im-label">{html.escape(title)}</span> '
-        f"{html.escape(values)}</p>"
-    )
+    values = "".join(f"<span>{html.escape(value)}</span>" for value in record_display(record).values())
+    return f'<p class="im-record-line"><span class="im-label">{html.escape(title)}</span>{values}</p>'
 
 
 def brief_example_html(example: dict) -> str:

@@ -1063,7 +1063,7 @@ summary:focus-visible,
   margin-top: 24px;
 }
 
-.im-example h3 {
+.im-example > h3 {
   margin: 0 0 8px;
   padding: 0;
   color: var(--im-ink);
@@ -1091,6 +1091,10 @@ summary:focus-visible,
 }
 
 .im-record-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 20px;
   margin: 0;
   color: var(--im-ink);
   font-size: 15px;
@@ -1100,11 +1104,11 @@ summary:focus-visible,
 }
 
 .im-record-line .im-label {
-  display: inline-block;
-  min-width: 128px;
+  min-width: 112px;
 }
 
-.im-evidence-list {
+/* Two classes, so this outranks the list indent Streamlit gives to lists in st.html. */
+.im-brief .im-evidence-list {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 8px;
@@ -1113,7 +1117,7 @@ summary:focus-visible,
   list-style: none;
 }
 
-.im-evidence-list li {
+.im-brief .im-evidence-list li {
   margin: 0;
 }
 
@@ -1262,6 +1266,10 @@ summary:focus-visible,
   }
 
   .im-record-line .im-label {
-    display: block;
+    flex-basis: 100%;
+  }
+
+  .im-record-line + .im-record-line {
+    margin-top: 4px;
   }
 }
