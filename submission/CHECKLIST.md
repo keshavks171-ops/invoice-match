@@ -52,7 +52,8 @@ required sentence "This project is a prototype and is not financial advice."
 
 ## 4. Demo video (optional, recommended): up to 2 minutes
 
-- [ ] Record with `submission/VIDEO_SCRIPT.md` (screen recording plus voice). Say only
+- [ ] Ready to upload as it is: `submission/demo-video.mp4`, a silent, captioned 1:58 walkthrough of the
+      live app. Or record your own with `submission/VIDEO_SCRIPT.md` (screen recording plus voice). Say only
       what is true for you; add your own nonprofit experience in your own words if you like
 - [ ] Upload to YouTube as Unlisted, or Google Drive with "anyone with the link can view"
 - [ ] Opened the link in a private window

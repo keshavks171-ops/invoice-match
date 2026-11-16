@@ -203,7 +203,7 @@ escape cells that start with `=`, `+`, `-` or `@` so a spreadsheet cannot run th
 | `data/challenge/` | Hand-authored challenge ledger |
 | `results/` | Frozen settings, validation log, model card, benchmark |
 | `tests/` | pytest suite |
-| `submission/` | Write-up, video script, finals outline, checklist, screenshots, click-through demo |
+| `submission/` | Write-up, video script and a captioned demo video, finals outline, checklist, screenshots, click-through demo |
 
 **Why Streamlit.** One language and one command: the app imports the same `matcher.py`
 that the benchmark runs, so what judges see is what was measured, and the team can explain
