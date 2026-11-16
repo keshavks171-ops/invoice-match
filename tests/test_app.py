@@ -1,11 +1,14 @@
-"""Tests for app.py: the review page driven by Streamlit's AppTest (no browser),
-and the pure helper functions (export, escaping, HTML fragments) called directly.
+"""Tests for app.py: the review and benchmark pages driven by Streamlit's AppTest
+(no browser), and the pure helper functions (export, escaping, HTML fragments)
+called directly.
 
 The fixtures in tests/fixtures are small hand-written ledgers with fictional
 vendors. They include a vendor that starts with '=' and one that starts with
 '+', a reference with leading zeros and blank optional fields.
 """
 
+import html
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -337,7 +340,8 @@ def test_export_has_one_row_per_reviewed_item_in_rank_order(fixture_dataset: app
     assert top["incoming_amount"] == "189.00" and top["payment_amount"] == "189.00"
     assert top["incoming_invoice_date"] == "2026-02-18"
     assert top["payment_row_id"] == "P-101"
-    assert top["match_score"] == f"{matcher.match_score(fixture_dataset.queue['score'].iloc[0]):.2f}"
+    assert top["match_score"] == f"{app.display_score(fixture_dataset.queue['score'].iloc[0]):.2f}"
+    assert all("0.01" <= score <= "0.99" for score in frame["match_score"])
 
 
 def test_export_keeps_leading_zeros_and_blank_fields(fixture_dataset: app.Dataset):
@@ -471,12 +475,202 @@ def test_next_unreviewed_skips_decided_items_and_wraps_around():
 
 
 # --------------------------------------------------------------------------
+# Match score display and the weak-match note
+# --------------------------------------------------------------------------
+
+def test_display_score_stays_between_one_and_ninety_nine_hundredths():
+    for decision_value in (-1000.0, -50.0, -6.0, -0.3, 0.0, 0.3, 6.0, 50.0, 1000.0):
+        score = app.display_score(decision_value)
+        assert 0.01 <= score <= 0.99
+        assert f"{score:.2f}" not in ("0.00", "1.00")
+    assert app.display_score(50.0) == 0.99 and app.display_score(-50.0) == 0.01
+    assert app.display_score(0.0) == pytest.approx(0.5)  # a score inside the range is not changed
+    assert app.display_score(1.0) == pytest.approx(matcher.match_score(1.0))
+
+
+def test_strong_pair_is_not_shown_as_a_certain_match():
+    at = start_demo()  # opens on the disguised duplicate, the strongest kind of pair
+    text = page_html(at)
+    assert '<p class="im-score-value">1.00</p>' not in text
+    shown = text.split('<p class="im-score-value">')[1].split("</p>")[0]
+    assert "0.01" <= shown <= "0.99"
+    assert app.SCORE_CAPTION in text
+
+
+def test_weak_match_note_depends_only_on_the_vendor_comparison():
+    incoming = pd.Series({"vendor": "Harbor Lane Catering", "invoice_ref": "HL-1", "amount_cents": 5000,
+                          "invoice_date": pd.Timestamp("2026-03-01"), "billing_period": "2026-03"})
+    same_vendor = incoming.copy()
+    same_vendor["invoice_ref"] = "HL-2"
+    other_vendor = incoming.copy()
+    other_vendor["vendor"] = "Quillfeather Print Works"
+    assert not app.vendor_differs(matcher.compare_fields(incoming, same_vendor))
+    assert app.vendor_differs(matcher.compare_fields(incoming, other_vendor))
+    assert app.WEAK_MATCH_MESSAGE in app.weak_match_html()
+
+
+def test_weak_match_note_is_shown_for_a_different_vendor_and_leaves_the_ranking_alone():
+    at = start_demo()
+    assert app.WEAK_MATCH_MESSAGE not in page_html(at)  # the disguised duplicate has a similar vendor
+    dataset = at.session_state["dataset"]
+    ranking_before = dataset.queue["incoming_id"].tolist()
+    weak_ids = [
+        entry.incoming_id for entry in dataset.queue.itertuples(index=False)
+        if app.vendor_differs(matcher.compare_fields(dataset.incoming.loc[entry.incoming_id],
+                                                     dataset.payments.loc[entry.payment_id]))
+    ]
+    if not weak_ids:
+        pytest.skip("the demo ledger has no invoice whose closest payment is from a different vendor")
+    at.number_input(key="review_limit").set_value(len(ranking_before)).run()  # every invoice is in the queue
+    at.radio(key="queue_choice").set_value(weak_ids[0]).run()
+    assert not at.exception
+    assert app.WEAK_MATCH_MESSAGE in page_html(at)
+    assert at.session_state["dataset"].queue["incoming_id"].tolist() == ranking_before
+
+
+# --------------------------------------------------------------------------
 # Benchmark page
 # --------------------------------------------------------------------------
 
-def test_benchmark_page_shows_its_empty_state():
-    at = AppTest.from_string("import app\napp.benchmark_page()", default_timeout=RUN_TIMEOUT).run()
+BENCHMARK_SCRIPT = "import app\napp.benchmark_page()"
+
+
+@pytest.fixture(scope="module")
+def benchmark_data() -> dict:
+    """The measured results in results/benchmark.json, the file the Benchmark page reads."""
+    if not app.BENCHMARK_PATH.exists():
+        pytest.skip("results/benchmark.json has not been generated")
+    return json.loads(app.BENCHMARK_PATH.read_text(encoding="utf-8"))
+
+
+def start_benchmark() -> AppTest:
+    """Run only the Benchmark page."""
+    return AppTest.from_string(BENCHMARK_SCRIPT, default_timeout=RUN_TIMEOUT).run()
+
+
+def test_benchmark_page_shows_its_empty_state_when_there_are_no_results(monkeypatch, tmp_path):
+    monkeypatch.setattr(app, "BENCHMARK_PATH", tmp_path / "benchmark.json")
+    at = start_benchmark()
     assert not at.exception
     assert [title.value for title in at.title] == ["Benchmark"]
     text = page_html(at).replace("<code>", "").replace("</code>", "")
-    assert "Benchmark results are not available yet. Run python evaluate.py to generate them." in text
+    assert ("Benchmark results are not available yet. "
+            "Run python evaluate.py --stage test to generate them.") in text
+    assert len(at.segmented_control) == 0
+
+
+def test_benchmark_page_renders_the_measured_results(benchmark_data: dict):
+    at = start_benchmark()
+    assert not at.exception
+    budget = benchmark_data["default_budget"]
+    methods, dataset = benchmark_data["methods"], benchmark_data["dataset"]
+    assert [title.value for title in at.title] == [f"How many duplicates can we catch in {budget} reviews?"]
+    assert at.segmented_control(key="benchmark_budget").value == budget
+    assert list(at.segmented_control(key="benchmark_budget").options) == [str(b) for b in benchmark_data["budgets"]]
+
+    text = page_html(at)
+    assert f'<p class="im-eyebrow">{benchmark_data["label"]}</p>' in text
+    assert html.escape(app.dataset_sentence(dataset)) in text
+    assert "These vendors and dates were never seen in training." in text
+    assert app.results_table_html(methods, budget, f"Results at a review budget of {budget}") in text
+    for method in methods:
+        result = method["results"][str(budget)]
+        assert html.escape(method["definition"]) in text
+        assert f"{result['correct']} of {dataset['known_duplicates']}" in text  # the bar's text label
+    for heading in ("Where the learned model fails", "What exact match misses", "Who gets held for review?",
+                    "Challenge set (hand-authored, reported separately)", "How to read this"):
+        assert f"<h2>{heading}</h2>" in text
+    for example in benchmark_data["examples"]:
+        assert html.escape(example["likely_cause"]) in text
+    assert f"Measured at {budget} reviews." in text
+    assert app.HELD_FOR_REVIEW_NOTE in text
+    challenge = benchmark_data["challenge"]
+    assert app.results_table_html(
+        challenge["methods"], challenge["budget"],
+        f"Challenge set results at a review budget of {challenge['budget']}") in text
+    assert "They are not a measure of real-world accuracy." in text
+    assert f"<code>{html.escape(benchmark_data['command'])}</code>" in text
+    assert html.escape(app.validation_sentence(benchmark_data)) in text
+
+
+def test_benchmark_budget_changes_the_title_and_the_table(benchmark_data: dict):
+    at = start_benchmark()
+    methods = benchmark_data["methods"]
+    for budget in benchmark_data["budgets"]:
+        at.segmented_control(key="benchmark_budget").set_value(budget).run()
+        assert not at.exception
+        assert [title.value for title in at.title] == [f"How many duplicates can we catch in {budget} reviews?"]
+        text = page_html(at)
+        assert app.results_table_html(methods, budget, f"Results at a review budget of {budget}") in text
+        assert app.bars_html(methods, budget, benchmark_data["dataset"]["known_duplicates"]) in text
+
+
+def test_percent_and_share_are_written_for_people():
+    assert app.percent(0.65) == "65%" and app.percent(1.0) == "100%" and app.percent(1 / 3) == "33%"
+    assert app.percent(None) == matcher.BLANK_DISPLAY
+    assert app.share(3, 247) == "3 of 247 (1.2%)"
+    assert app.share(0, 0) == "0 of 0"
+    assert app.counted(1, "ledger", "ledgers") == "1 ledger"
+    assert app.counted(1475, "prior payment", "prior payments") == "1,475 prior payments"
+
+
+def test_results_table_shows_an_em_dash_when_nothing_was_flagged_and_escapes_names():
+    nothing_flagged = {"reviews_used": 0, "correct": 0, "false_flags": 0, "missed": 4,
+                       "precision": None, "recall": 0.0}
+    methods = [{"key": "exact", "name": "Exact <b>match</b>", "results": {"5": nothing_flagged}}]
+    text = app.results_table_html(methods, 5, "A <i>caption</i>")
+    assert f'<td data-label="Precision">{matcher.BLANK_DISPLAY}</td>' in text
+    assert '<td data-label="Recall">0%</td>' in text
+    assert '<td data-label="Duplicates missed">4</td>' in text
+    assert "<b>" not in text and "<i>" not in text
+
+
+def test_bars_share_one_scale_and_carry_their_values_as_text():
+    def method(key: str, correct: int) -> dict:
+        return {"key": key, "name": key.capitalize(), "results": {"20": {"correct": correct}}}
+
+    text = app.bars_html([method("exact", 0), method("fuzzy", 10), method("learned", 13)], 20, 20)
+    assert 'im-bar-baseline" style="width: 0.0%"' in text
+    assert 'im-bar-baseline" style="width: 50.0%"' in text
+    assert 'im-bar-learned" style="width: 65.0%"' in text
+    for label in ("0 of 20", "10 of 20", "13 of 20"):
+        assert f'<span class="im-bar-value">{label}</span>' in text
+    assert "<figcaption>" in text
+
+
+def benchmark_example(kind: str) -> dict:
+    """A made-up benchmark example with hostile text and blank optional fields."""
+    record = {"row_id": "X-1", "vendor": "<script>alert(1)</script>", "invoice_ref": "",
+              "amount_cents": 15000, "invoice_date": "2026-05-30", "billing_period": ""}
+    proposed = dict(record, row_id="P-1", vendor="Proposed & Co", invoice_ref="A-1", billing_period="2026-05")
+    true_payment = dict(record, row_id="P-2", vendor="True Payee", invoice_ref="B-2", billing_period="2026-04")
+    comparisons = [
+        {"field": "vendor", "label": "Vendor", "status": "differ", "evidence": "Different vendor names"},
+        {"field": "invoice_ref", "label": "Invoice reference", "status": "missing", "evidence": "Missing <b>ref</b>"},
+        {"field": "amount", "label": "Amount", "status": "match", "evidence": "Same amount"},
+        {"field": "invoice_date", "label": "Invoice date", "status": "match", "evidence": "Same invoice date"},
+        {"field": "billing_period", "label": "Billing period", "status": "missing", "evidence": "Missing period"},
+    ]
+    return {"method": "learned", "kind": kind, "budget": 20, "rank": 23, "incoming": record,
+            "proposed_payment": proposed, "true_payment": true_payment if kind != "false_flag" else None,
+            "comparisons": comparisons, "likely_cause": "Cause with <img src=x> in it."}
+
+
+def test_benchmark_examples_compare_with_the_right_payment_and_escape_text():
+    missed = app.example_html(benchmark_example("missed_duplicate"))
+    assert "A known duplicate ranked 23, below the review budget of 20" in missed
+    assert "True Payee" in missed and "Proposed &amp; Co" not in missed  # set against the payment it repeats
+    assert "Prior payment it repeats" in missed
+
+    flagged = app.example_html(benchmark_example("false_flag"))
+    assert "A legitimate invoice that was flagged for review" in flagged
+    assert "Proposed &amp; Co" in flagged and "Prior payment the model proposed" in flagged
+
+    brief = app.brief_example_html(benchmark_example("caught_duplicate"))
+    for text in (missed, flagged, brief):
+        assert "<script>" not in text and "<img" not in text and "<b>" not in text
+        assert "&lt;script&gt;alert(1)&lt;/script&gt;" in text
+        assert "Cause with &lt;img src=x&gt; in it." in text
+        assert "$150.00" in text and "May 30, 2026" in text
+    assert f'<span class="im-value">{matcher.BLANK_DISPLAY}</span>' in missed  # blank reference and period
+    assert "im-evidence-missing" in missed and "im-evidence-match" in brief

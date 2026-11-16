@@ -1,0 +1,389 @@
+<title>Invoice Match Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a working accounts-payable review desk. Narrow ranked queue on the left,
+   the side-by-side comparison as the focal point on the right, benchmark as a second view. */
+:root {
+  --canvas: #F5F6F3; --surface: #FFFFFF; --ink: #14231E; --muted: #52615B; --border: #DCE4DF;
+  --primary: #155645; --on-primary: #FFFFFF; --primary-soft: #E6F0EB;
+  --match-bg: #DCEFEA; --match-fg: #0F4A3C; --differ-bg: #FBE9C0; --differ-fg: #6B4300;
+  --missing-bg: #ECEFED; --missing-fg: #47544F; --info-bg: #E2E9F5; --info-fg: #27406B;
+  --bar-neutral: #9AA8A2; --shadow: 0 1px 2px rgba(20, 35, 30, 0.06);
+  --font: "Instrument Sans", Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --canvas: #101714; --surface: #18211D; --ink: #E8EFEB; --muted: #A3B1AB; --border: #2B3833;
+  --primary: #6FC3A6; --on-primary: #0C1512; --primary-soft: #1D2F28;
+  --match-bg: #173A31; --match-fg: #A9E2CF; --differ-bg: #45330B; --differ-fg: #F4D58A;
+  --missing-bg: #26302C; --missing-fg: #B7C3BE; --info-bg: #1F2B42; --info-fg: #B9CCF0;
+  --bar-neutral: #5E6D67; --shadow: none; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --canvas: #101714; --surface: #18211D; --ink: #E8EFEB; --muted: #A3B1AB; --border: #2B3833;
+  --primary: #6FC3A6; --on-primary: #0C1512; --primary-soft: #1D2F28;
+  --match-bg: #173A31; --match-fg: #A9E2CF; --differ-bg: #45330B; --differ-fg: #F4D58A;
+  --missing-bg: #26302C; --missing-fg: #B7C3BE; --info-bg: #1F2B42; --info-fg: #B9CCF0;
+  --bar-neutral: #5E6D67; --shadow: none; color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+.wrap > *, .panel, section { min-width: 0; max-width: 100% }
+main.wrap { margin: 0; width: 100% }
+body { background: var(--canvas); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45;
+  padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px }
+button, input { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px }
+.num { font-variant-numeric: tabular-nums }
+h1, h2, h3, p { margin: 0 }
+h1 { font-size: 28px; letter-spacing: -0.01em; text-wrap: balance }
+h2 { font-size: 20px; text-wrap: balance }
+h3 { font-size: 15px }
+.muted { color: var(--muted) }
+.small { font-size: 13px }
+
+.top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 16px; border-bottom: 1px solid var(--border) }
+.brand { font-weight: 700; font-size: 17px; color: var(--primary) }
+.tabs { display: flex; gap: 4px }
+.tab { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 500 }
+.tab[aria-selected="true"] { background: var(--primary-soft); color: var(--primary) }
+.note { margin-left: auto; font-size: 13px; color: var(--muted) }
+
+.btn { border: 1px solid var(--border); background: var(--surface); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 500 }
+.btn:hover { border-color: var(--primary) }
+.btn.primary, .btn[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary) }
+.btn:disabled { opacity: 0.5; cursor: default }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow) }
+.summary { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-end; padding: 16px 20px }
+.stat b { display: block; font-size: 26px; line-height: 1.1 }
+.stat span, label.field span { font-size: 13px; color: var(--muted) }
+label.field { display: flex; flex-direction: column; gap: 4px; margin-left: auto }
+label.field input { width: 96px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface) }
+
+.desk { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 24px; align-items: start }
+.queue { max-height: 640px; overflow-y: auto; padding: 0; margin: 0; list-style: none }
+.queue button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--border); background: transparent; padding: 12px 14px; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px }
+.queue li:last-child button { border-bottom: 0 }
+.queue button[aria-current="true"] { background: var(--primary-soft); box-shadow: inset 3px 0 0 var(--primary) }
+.queue .v { font-weight: 600; overflow-wrap: anywhere }
+.queue .a { font-weight: 600 }
+.queue .m { grid-column: 1 / -1; font-size: 13px; color: var(--muted) }
+.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: normal }
+.pill.match { background: var(--match-bg); color: var(--match-fg) }
+.pill.differ, .pill.partial { background: var(--differ-bg); color: var(--differ-fg) }
+.pill.missing { background: var(--missing-bg); color: var(--missing-fg) }
+.pill.info { background: var(--info-bg); color: var(--info-fg) }
+
+.detail { display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+.headline { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; justify-content: space-between }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.card h3 { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px }
+.card h3 small { font-weight: 400; color: var(--muted) }
+.card.in h3 { color: var(--primary) }
+.f { padding: 10px 16px; border-bottom: 1px solid var(--border); min-height: 86px; display: flex; flex-direction: column; gap: 2px }
+.f:last-child { border-bottom: 0 }
+.f .l { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap }
+.f .val { font-size: 16px; font-weight: 500; overflow-wrap: anywhere }
+.f.amount .val { font-size: 26px; font-weight: 700; line-height: 1.15 }
+.f .n { font-size: 13px; color: var(--muted) }
+.why { padding: 16px 20px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px }
+.why ul { margin: 6px 0 0; padding-left: 18px }
+.score b { font-size: 26px; display: block }
+.score { max-width: 220px }
+.notice { padding: 10px 14px; border-radius: 8px; background: var(--missing-bg); color: var(--missing-fg); font-size: 14px }
+details { padding: 12px 20px }
+summary { cursor: pointer; font-weight: 600 }
+.contrib { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 56px; gap: 6px 12px; align-items: center; margin-top: 10px; font-size: 13px }
+.track { height: 10px; position: relative; background: var(--missing-bg); border-radius: 5px }
+.track i { position: absolute; top: 0; bottom: 0; border-radius: 5px }
+.track i.pos { left: 50%; background: var(--primary) }
+.track i.neg { right: 50%; background: var(--differ-fg) }
+kbd { font: inherit; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; background: var(--surface) }
+textarea { width: 100%; min-height: 120px; font: 12px ui-monospace, Menlo, Consolas, monospace; background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 8px; padding: 8px }
+
+.tablewrap { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums }
+th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap }
+th:first-child, td:first-child { text-align: left }
+th { font-size: 13px; color: var(--muted); font-weight: 500 }
+tr.lead td { font-weight: 700 }
+.bars { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px 12px; align-items: center; padding: 16px 20px }
+.bar { height: 14px; background: var(--missing-bg); border-radius: 7px; overflow: hidden }
+.bar i { display: block; height: 100%; background: var(--bar-neutral); border-radius: 7px; transition: width 0.25s }
+.bar i.lead { background: var(--primary) }
+.pad { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px }
+.mini { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; overflow-wrap: anywhere }
+.mini b { display: block; font-size: 13px; color: var(--muted); font-weight: 500 }
+@media (max-width: 860px) {
+  .desk { grid-template-columns: minmax(0, 1fr) }
+  .queue { max-height: 260px }
+  .cards, .pair, .why { grid-template-columns: minmax(0, 1fr) }
+  label.field { margin-left: 0 }
+  .f { min-height: 0 }
+}
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Invoice Match</span>
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-queue" aria-selected="true" aria-controls="view-queue">Review queue</button>
+      <button class="tab" role="tab" id="tab-benchmark" aria-selected="false" aria-controls="view-benchmark">Benchmark</button>
+    </div>
+    <span class="note">Click-through demo. Scores come from the project's Python model. Prototype, not financial advice.</span>
+  </header>
+
+  <main id="view-queue" role="tabpanel" aria-labelledby="tab-queue" class="wrap">
+    <div>
+      <h1>Invoice review</h1>
+      <p class="muted" id="intro"></p>
+    </div>
+    <section class="panel summary" aria-label="Progress">
+      <div class="stat"><span>Incoming invoices</span><b class="num" id="n-in"></b></div>
+      <div class="stat"><span>Queued for review</span><b class="num" id="n-q"></b></div>
+      <div class="stat"><span>Reviewed</span><b class="num" id="n-r"></b></div>
+      <label class="field" for="limit"><span>Review limit</span><input id="limit" type="number" min="1" value="20" class="num"></label>
+      <div class="row">
+        <button class="btn" id="copy">Copy reviewed CSV</button>
+        <button class="btn" id="reset">Clear decisions</button>
+      </div>
+    </section>
+    <textarea id="csv" hidden readonly aria-label="Reviewed items as CSV"></textarea>
+    <div>
+      <p class="small muted">Demo cases</p>
+      <div class="row" id="cases"></div>
+      <p class="small muted" id="case-note" style="margin-top:6px"></p>
+    </div>
+    <div class="desk">
+      <section aria-label="Review queue">
+        <div class="headline" style="margin-bottom:8px"><h2>Review queue</h2><span class="small muted" id="q-count"></span></div>
+        <ul class="queue panel" id="queue"></ul>
+        <p class="small muted" style="margin-top:8px">Keys: <kbd>J</kbd>/<kbd>K</kbd> next and previous, <kbd>D</kbd> duplicate, <kbd>L</kbd> legitimate, <kbd>N</kbd> needs information, <kbd>U</kbd> undo.</p>
+      </section>
+      <section class="detail" id="detail" aria-live="polite"></section>
+    </div>
+  </main>
+
+  <main id="view-benchmark" role="tabpanel" aria-labelledby="tab-benchmark" class="wrap" hidden></main>
+</div>
+
+<script type="application/json" id="data">__DEMO_DATA__</script>
+<script>
+(function () {
+  var DATA = JSON.parse(document.getElementById("data").textContent);
+  var ITEMS = DATA.items, BENCH = DATA.benchmark;
+  var DECISIONS = ["Possible duplicate", "Legitimate bill", "Needs more information"];
+  var PILL = { "Possible duplicate": "differ", "Legitimate bill": "match", "Needs more information": "info" };
+  var FEATURES = {
+    vendor_tfidf_cosine: "Vendor name similarity (shared letter groups)", vendor_fuzzy: "Vendor name similarity (spelling)",
+    ref_similarity: "Invoice reference similarity", ref_exact: "Invoice references equal",
+    ref_missing_incoming: "Reference missing on incoming invoice", ref_missing_payment: "Reference missing on prior payment",
+    amount_exact: "Amounts equal", amount_diff: "Amount difference", date_gap: "Invoice date gap",
+    period_same: "Same billing period", period_different: "Different billing period",
+    period_missing_incoming: "Billing period missing on incoming invoice", period_missing_payment: "Billing period missing on prior payment"
+  };
+  var state = { selected: ITEMS[0].incoming.row_id, limit: 20, decisions: {}, budget: String(BENCH.default_budget) };
+  try { state.decisions = JSON.parse(localStorage.getItem("invoice-match-demo") || "{}"); } catch (e) {}
+
+  function $(id) { return document.getElementById(id); }
+  function esc(text) {
+    return String(text == null ? "" : text).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function save() { try { localStorage.setItem("invoice-match-demo", JSON.stringify(state.decisions)); } catch (e) {} }
+  function item(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].incoming.row_id === id) return ITEMS[i]; return ITEMS[0]; }
+  function inQueue() { return ITEMS.slice(0, state.limit); }
+  function pct(x) { return x == null ? "—" : Math.round(x * 100) + "%"; }
+
+  // ---------------------------------------------------------------- queue view
+  function renderSummary() {
+    $("intro").textContent = "Built-in demo ledger. Each incoming invoice is compared with " + DATA.n_payments + " prior payments; the model keeps its closest one.";
+    $("n-in").textContent = ITEMS.length;
+    $("n-q").textContent = Math.min(state.limit, ITEMS.length);
+    $("n-r").textContent = Object.keys(state.decisions).length;
+    $("q-count").textContent = "Top " + Math.min(state.limit, ITEMS.length) + " of " + ITEMS.length;
+  }
+  function renderCases() {
+    $("cases").innerHTML = DATA.cases.map(function (c) {
+      return '<button class="btn" data-case="' + esc(c.incoming_id) + '" aria-pressed="' + (c.incoming_id === state.selected) + '">' + esc(c.title) + "</button>";
+    }).join("");
+    var current = DATA.cases.filter(function (c) { return c.incoming_id === state.selected; })[0];
+    $("case-note").textContent = current ? current.summary : "";
+  }
+  function renderQueue() {
+    $("queue").innerHTML = inQueue().map(function (it) {
+      var d = state.decisions[it.incoming.row_id];
+      var status = d ? '<span class="pill ' + PILL[d] + '">' + esc(d) + "</span>" : "Not reviewed";
+      return '<li><button data-id="' + esc(it.incoming.row_id) + '" aria-current="' + (it.incoming.row_id === state.selected) + '">' +
+        '<span class="v">' + esc(it.incoming.vendor) + '</span><span class="a num">' + esc(it.incoming.amount) + "</span>" +
+        '<span class="m">' + esc(it.incoming.invoice_ref || "No reference") + " · " + status + "</span></button></li>";
+    }).join("");
+    var current = $("queue").querySelector('[aria-current="true"]');
+    if (current && current.scrollIntoView) current.scrollIntoView({ block: "nearest" });
+  }
+  function cardHtml(it, side) {
+    var rec = side === "in" ? it.incoming : it.payment;
+    var rows = it.comparisons.map(function (c) {
+      var value = side === "in" ? c.incoming_display : c.payment_display;
+      var note = side === "in" ? c.incoming_note : c.payment_note;
+      var chip = side === "pay" ? '<span class="pill ' + esc(c.status) + '">' + esc(c.evidence) + "</span>" : "";
+      return '<div class="f ' + esc(c.field) + '"><div class="l"><span>' + esc(c.label) + "</span>" + chip + "</div>" +
+        '<div class="val num">' + esc(value) + '</div><div class="n">' + esc(note) + "</div></div>";
+    }).join("");
+    return '<div class="panel card ' + side + '"><h3>' + (side === "in" ? "Incoming invoice" : "Prior payment") +
+      "<small>" + esc(rec.row_id) + "</small></h3>" + rows + "</div>";
+  }
+  function contribHtml(it) {
+    var max = Math.max.apply(null, it.contributions.map(function (c) { return Math.abs(c.contribution); })) || 1;
+    var rows = it.contributions.slice().sort(function (a, b) { return Math.abs(b.contribution) - Math.abs(a.contribution); }).map(function (c) {
+      var width = Math.round(Math.abs(c.contribution) / max * 50);
+      return "<span>" + esc(FEATURES[c.feature] || c.feature) + '</span><span class="track"><i class="' + (c.contribution >= 0 ? "pos" : "neg") +
+        '" style="width:' + width + '%"></i></span><span class="num" style="text-align:right">' + (c.contribution >= 0 ? "+" : "−") + Math.abs(c.contribution).toFixed(2) + "</span>";
+    }).join("");
+    return '<details class="panel"><summary>Model details</summary><p class="small muted" style="margin-top:6px">Model contributions in log-odds: ' +
+      "coefficient × standardized feature value, from the fitted logistic regression. These are not the field comparisons above. " +
+      "Baseline (intercept) " + it.intercept.toFixed(2) + "; sum " + it.decision_value.toFixed(2) + ".</p>" +
+      '<div class="contrib">' + rows + "</div></details>";
+  }
+  function renderDetail() {
+    var it = item(state.selected), within = it.rank <= state.limit, d = state.decisions[it.incoming.row_id];
+    var vendor = it.comparisons.filter(function (c) { return c.field === "vendor"; })[0];
+    var list = within ? it.flag_reasons : it.difference_notes;
+    var html = '<div class="headline"><h2>' + esc(it.incoming.vendor) + ' <span class="num">' + esc(it.incoming.amount) + "</span></h2>" +
+      '<span class="small muted">Ranked ' + it.rank + " of " + ITEMS.length + " by match score</span></div>";
+    if (!within) html += '<div class="notice">Ranked ' + it.rank + " of " + ITEMS.length + ", below the review limit of " + state.limit + ". Shown as a demo case.</div>";
+    if (vendor && vendor.status === "differ") html += '<div class="notice">No similar prior payment was found for this invoice. The closest one the model could find is shown.</div>';
+    html += '<div class="cards">' + cardHtml(it, "in") + cardHtml(it, "pay") + "</div>";
+    html += '<div class="panel why"><div><h3>' + (within ? "Why this was flagged" : "Why this ranks lower") + "</h3><ul>" +
+      (list.length ? list.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") : "<li>No field agrees strongly.</li>") + "</ul>" +
+      (within && it.difference_notes.length ? '<h3 style="margin-top:12px">Check before deciding</h3><ul>' + it.difference_notes.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" : "") +
+      '</div><div class="score"><span class="small muted">Match score</span><b class="num">' + it.match_score.toFixed(2) +
+      '</b><span class="small muted">A ranking score, not a probability. The decision is yours.</span></div></div>';
+    html += '<div class="row" role="group" aria-label="Decision">' + DECISIONS.map(function (name) {
+      return '<button class="btn" data-decision="' + esc(name) + '" aria-pressed="' + (d === name) + '">' + esc(name) + "</button>";
+    }).join("") + '<button class="btn" id="undo"' + (d ? "" : " disabled") + '>Undo</button><button class="btn" id="next">Next unreviewed</button></div>';
+    html += '<p class="small muted">' + (d ? "Recorded: " + esc(d) + "." : "No decision recorded yet.") + "</p>" + contribHtml(it);
+    $("detail").innerHTML = html;
+  }
+  function renderAll() { renderSummary(); renderCases(); renderQueue(); renderDetail(); }
+
+  function decide(name) { state.decisions[state.selected] = name; save(); renderAll(); }
+  function undo() { delete state.decisions[state.selected]; save(); renderAll(); }
+  function step(delta) {
+    var ids = inQueue().map(function (it) { return it.incoming.row_id; }), at = ids.indexOf(state.selected);
+    state.selected = ids[Math.max(0, Math.min(ids.length - 1, (at < 0 ? 0 : at + delta)))]; renderAll();
+  }
+  function nextUnreviewed() {
+    var ids = inQueue().map(function (it) { return it.incoming.row_id; }), at = ids.indexOf(state.selected);
+    var order = ids.slice(at + 1).concat(ids.slice(0, at + 1));
+    for (var i = 0; i < order.length; i++) if (!state.decisions[order[i]] && order[i] !== state.selected) { state.selected = order[i]; break; }
+    renderAll();
+  }
+  function safeCell(text) {  // stop spreadsheets from running text as a formula, then quote for CSV
+    text = String(text);
+    if (/^\s*[=+\-@\t\r\n]/.test(text)) text = "'" + text;
+    return /[",\n\r]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+  }
+  function reviewedCsv() {
+    var lines = ["rank,decision,match_score,incoming_row_id,incoming_vendor,incoming_invoice_ref,incoming_amount,incoming_invoice_date,incoming_billing_period,payment_row_id,payment_vendor,payment_invoice_ref,payment_amount,payment_invoice_date,payment_billing_period"];
+    ITEMS.forEach(function (it) {
+      var d = state.decisions[it.incoming.row_id]; if (!d) return;
+      var a = it.incoming, b = it.payment;
+      lines.push([it.rank, d, it.match_score.toFixed(2), a.row_id, a.vendor, a.invoice_ref, a.amount_plain, a.invoice_date, a.billing_period,
+        b.row_id, b.vendor, b.invoice_ref, b.amount_plain, b.invoice_date, b.billing_period].map(safeCell).join(","));
+    });
+    return lines.join("\r\n");
+  }
+
+  $("queue").addEventListener("click", function (e) { var b = e.target.closest("button[data-id]"); if (b) { state.selected = b.dataset.id; renderAll(); } });
+  $("cases").addEventListener("click", function (e) { var b = e.target.closest("button[data-case]"); if (b) { state.selected = b.dataset.case; renderAll(); } });
+  $("detail").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.decision) decide(b.dataset.decision); else if (b.id === "undo") undo(); else if (b.id === "next") nextUnreviewed();
+  });
+  $("limit").addEventListener("input", function () { var n = parseInt(this.value, 10); if (n >= 1) { state.limit = n; renderAll(); } });
+  $("reset").addEventListener("click", function () { state.decisions = {}; save(); $("csv").hidden = true; renderAll(); });
+  $("copy").addEventListener("click", function () {
+    var text = reviewedCsv(), box = $("csv"), button = this;
+    box.value = text; box.hidden = false;
+    var done = function () { button.textContent = "Copied"; setTimeout(function () { button.textContent = "Copy reviewed CSV"; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { box.select(); }); else box.select();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.target.matches("input, textarea") || e.metaKey || e.ctrlKey || e.altKey || $("view-queue").hidden) return;
+    var k = e.key.toLowerCase();
+    if (k === "j") step(1); else if (k === "k") step(-1); else if (k === "d") decide(DECISIONS[0]);
+    else if (k === "l") decide(DECISIONS[1]); else if (k === "n") decide(DECISIONS[2]); else if (k === "u") undo();
+  });
+
+  // ------------------------------------------------------------ benchmark view
+  function tableHtml(methods, budget) {
+    var best = Math.max.apply(null, methods.map(function (m) { return m.results[budget].correct; }));
+    return '<div class="tablewrap"><table><thead><tr><th>Method</th><th>Reviews used</th><th>Correct matches</th><th>False flags</th><th>Duplicates missed</th><th>Precision</th><th>Recall</th></tr></thead><tbody>' +
+      methods.map(function (m) {
+        var r = m.results[budget];
+        return '<tr class="' + (m.key === "learned" ? "lead" : "") + '"><td>' + esc(m.name) + "</td><td>" + r.reviews_used + "</td><td>" + r.correct + "</td><td>" + r.false_flags +
+          "</td><td>" + r.missed + "</td><td>" + pct(r.precision) + "</td><td>" + pct(r.recall) + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+  function recordHtml(title, r) {
+    if (!r) return "";
+    return '<div class="mini"><b>' + esc(title) + "</b>" + esc(r.vendor) + "<br>Reference " + esc(r.invoice_ref || "—") +
+      ' · <span class="num">$' + (r.amount_cents / 100).toFixed(2) + "</span><br>" + esc(r.invoice_date) + " · period " + esc(r.billing_period || "—") + "</div>";
+  }
+  function exampleHtml(ex) {
+    var titles = { missed_duplicate: "A known duplicate ranked " + ex.rank + ", below the " + ex.budget + " reviews",
+      false_flag: "A legitimate invoice that was flagged (rank " + ex.rank + ")", caught_duplicate: "A duplicate exact match misses (learned model rank " + ex.rank + ")" };
+    var other = ex.kind === "missed_duplicate" ? ex.true_payment : ex.proposed_payment;
+    return '<div class="pad" style="padding:0"><h3>' + esc(titles[ex.kind]) + '</h3><div class="pair">' + recordHtml("Incoming invoice", ex.incoming) + recordHtml("Prior payment", other) + "</div>" +
+      '<div class="row">' + ex.comparisons.map(function (c) { return '<span class="pill ' + esc(c.status) + '">' + esc(c.evidence) + "</span>"; }).join("") + "</div>" +
+      '<p class="small muted">' + esc(ex.likely_cause) + "</p></div>";
+  }
+  function renderBenchmark() {
+    var d = BENCH.dataset, b = state.budget, ch = BENCH.challenge;
+    var html = '<div><span class="pill missing">' + esc(BENCH.label) + '</span><h1 style="margin-top:8px">How many duplicates can we catch in ' + b + " reviews?</h1>" +
+      '<p class="muted">Held-out test set: ' + d.incoming + " incoming invoices, " + d.known_duplicates + " known duplicates, " + d.prior_payments.toLocaleString() + " prior payments in " +
+      d.ledgers + " ledgers, invoice dates " + esc(d.date_start) + " to " + esc(d.date_end) + ". These vendors and dates were never seen in training.</p></div>";
+    html += '<div class="row" role="group" aria-label="Review budget"><span class="small muted">Review budget</span>' + BENCH.budgets.map(function (x) {
+      return '<button class="btn" data-budget="' + x + '" aria-pressed="' + (String(x) === b) + '">' + x + "</button>"; }).join("") +
+      '<span class="small muted">Every budget is a slice of the same frozen ranking.</span></div>';
+    html += '<section class="panel">' + tableHtml(BENCH.methods, b) + '<div class="bars" aria-label="Correct matches by method">' + BENCH.methods.map(function (m) {
+      var c = m.results[b].correct;
+      return "<span>" + esc(m.name) + '</span><span class="bar"><i class="' + (m.key === "learned" ? "lead" : "") + '" style="width:' + (c / d.known_duplicates * 100) +
+        '%"></i></span><span class="num"><b>' + c + "</b> of " + d.known_duplicates + "</span>"; }).join("") + "</div></section>";
+    html += '<section class="panel pad"><h2>How each method works</h2>' + BENCH.methods.map(function (m) { return '<p class="small"><b>' + esc(m.name) + ".</b> " + esc(m.definition) + "</p>"; }).join("") + "</section>";
+    var fails = BENCH.examples.filter(function (e) { return e.kind !== "caught_duplicate"; }), caught = BENCH.examples.filter(function (e) { return e.kind === "caught_duplicate"; });
+    html += '<section class="panel pad"><h2>Where the learned model fails</h2>' + fails.map(exampleHtml).join("") + "</section>";
+    if (caught.length) html += '<section class="panel pad"><h2>What exact match misses</h2>' + caught.map(exampleHtml).join("") + "</section>";
+    html += '<section class="panel pad"><h2>Who gets held for review?</h2><p class="small muted">Legitimate invoices flagged at 20 reviews. Individuals are often freelancers who bill the same fee repeatedly and leave out invoice numbers; a tool that flags them more often delays their pay.</p>' +
+      '<div class="tablewrap"><table><thead><tr><th>Vendor kind</th>' + BENCH.methods.map(function (m) { return "<th>" + esc(m.name) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      BENCH.slices.vendor_kind.map(function (s) {
+        return "<tr><td>" + (s.group === "individual" ? "Individuals" : "Organizations") + "</td>" + BENCH.methods.map(function (m) {
+          var n = s.methods[m.key].legit_flagged; return "<td>" + n + " of " + s.legit_invoices + " (" + (n / s.legit_invoices * 100).toFixed(1) + "%)</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div></section>";
+    if (ch) html += '<section class="panel pad"><h2>Challenge set (hand-authored, reported separately)</h2><p class="small muted">' + ch.dataset.incoming + " incoming invoices, " +
+      ch.dataset.known_duplicates + " known duplicates, " + ch.budget + " reviews.</p>" + tableHtml(ch.methods, String(ch.budget)) + "</section>";
+    var v = BENCH.validation_summary;
+    html += '<section class="panel pad"><h2>How to read this</h2><p class="small">Measured on synthetic data with fictional vendors. It is not a measure of real-world accuracy. ' +
+      "The test set was scored once, after settings were frozen on validation, where the methods found " + v.exact.correct + ", " + v.fuzzy.correct + " and " + v.learned.correct +
+      " of " + (v.learned.correct + v.learned.missed) + " known duplicates (exact match, fuzzy rule, learned model). Reproduce with <code>" + esc(BENCH.command) + "</code>.</p></section>";
+    $("view-benchmark").innerHTML = html;
+  }
+  $("view-benchmark").addEventListener("click", function (e) { var b = e.target.closest("button[data-budget]"); if (b) { state.budget = b.dataset.budget; renderBenchmark(); $("view-benchmark").querySelector('[data-budget="' + state.budget + '"]').focus(); } });
+
+  function show(view) {
+    ["queue", "benchmark"].forEach(function (name) {
+      $("view-" + name).hidden = name !== view; $("tab-" + name).setAttribute("aria-selected", String(name === view));
+    });
+  }
+  $("tab-queue").addEventListener("click", function () { show("queue"); });
+  $("tab-benchmark").addEventListener("click", function () { show("benchmark"); });
+
+  renderAll(); renderBenchmark();
+})();
+</script>

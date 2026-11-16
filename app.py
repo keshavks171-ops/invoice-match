@@ -35,6 +35,7 @@ import matcher
 APP_DIR = Path(__file__).resolve().parent
 CSS_PATH = APP_DIR / "assets" / "app.css"
 DEMO_DIR = matcher.DATA_DIR / "demo"
+BENCHMARK_PATH = matcher.RESULTS_DIR / "benchmark.json"
 
 NOT_REVIEWED = "Not reviewed"
 DECISIONS = ("Possible duplicate", "Legitimate bill", "Needs more information")
@@ -54,13 +55,35 @@ MINUS_SIGN = "\u2212"
 TIMES_SIGN = "\u00d7"
 
 SCORE_CAPTION = "A ranking score, not a probability. The decision is yours."
+# The score is shown and exported inside this range, so two decimals never read as 0.00 or 1.00.
+SCORE_DISPLAY_MIN = 0.01
+SCORE_DISPLAY_MAX = 0.99
+WEAK_MATCH_MESSAGE = (
+    "No similar prior payment was found for this invoice. The closest one the model could find is shown."
+)
 NO_PAYMENTS_MESSAGE = (
     "No prior payments to compare against. Without payment history no incoming invoice can be "
     "checked for an earlier copy. Upload a prior payments CSV with at least one row to build a review queue."
 )
 BENCHMARK_EMPTY_HTML = (
     '<div class="im-empty"><p>Benchmark results are not available yet. '
-    "Run <code>python evaluate.py</code> to generate them.</p></div>"
+    "Run <code>python evaluate.py --stage test</code> to generate them.</p></div>"
+)
+
+# The columns of a benchmark results table: the key in results/benchmark.json and the heading shown.
+RESULT_COLUMNS = (
+    ("reviews_used", "Reviews used"),
+    ("correct", "Correct matches"),
+    ("false_flags", "False flags"),
+    ("missed", "Duplicates missed"),
+    ("precision", "Precision"),
+    ("recall", "Recall"),
+)
+# Headings for the vendor groups in the "Who gets held for review?" table.
+VENDOR_GROUP_LABELS = {"organization": "Organizations", "individual": "Individuals"}
+HELD_FOR_REVIEW_NOTE = (
+    "Individuals are often freelancers who bill the same fee repeatedly and leave out invoice numbers; "
+    "a tool that flags them more often delays their pay."
 )
 
 # Plain names for the model's inputs, shown in the "Model details" table.
@@ -184,6 +207,17 @@ def next_unreviewed(queue_ids: list[str], decisions: dict[str, str], current_id:
 # Export
 # --------------------------------------------------------------------------
 
+def display_score(decision_value: float) -> float:
+    """The match score as it is shown and exported: kept between 0.01 and 0.99.
+
+    A strong pair scores so close to 1 that two decimals would print 1.00,
+    which reads like certainty. Only the printed number is limited; the
+    ranking uses the model's decision values and is not touched.
+    """
+    score = matcher.match_score(decision_value)
+    return min(max(score, SCORE_DISPLAY_MIN), SCORE_DISPLAY_MAX)
+
+
 def plain_amount(cents: int) -> str:
     """46820 -> '468.20', the form a spreadsheet reads as a number."""
     cents = int(cents)
@@ -211,7 +245,7 @@ def build_export_frame(dataset: Dataset, decisions: dict[str, str]) -> pd.DataFr
         row = {
             "rank": int(entry.rank),
             "decision": decisions[entry.incoming_id],
-            "match_score": f"{matcher.match_score(entry.score):.2f}",
+            "match_score": f"{display_score(entry.score):.2f}",
         }
         row.update(export_fields("incoming", dataset.incoming.loc[entry.incoming_id]))
         row.update(export_fields("payment", dataset.payments.loc[entry.payment_id]))
@@ -305,17 +339,32 @@ def field_html(comparison: matcher.FieldComparison, side: str) -> str:
     )
 
 
-def cards_html(comparisons: list[matcher.FieldComparison], incoming_id: str, payment_id: str) -> str:
-    """The two cards, 'Incoming invoice' and 'Prior payment', with the same rows in the same order."""
+def cards_html(comparisons: list[matcher.FieldComparison], incoming_id: str, payment_id: str,
+               payment_title: str = "Prior payment") -> str:
+    """The two cards, 'Incoming invoice' and 'Prior payment', with the same rows in the same order.
+
+    The benchmark page passes its own title for the payment card.
+    """
     cards = ""
-    for side, title, row_id in (("incoming", "Incoming invoice", incoming_id), ("payment", "Prior payment", payment_id)):
+    for side, title, row_id in (("incoming", "Incoming invoice", incoming_id), ("payment", payment_title, payment_id)):
         fields = "".join(field_html(comparison, side) for comparison in comparisons)
         cards += (
-            f'<section class="im-card im-card-{side}" aria-label="{title}">'
-            f'<h3 class="im-card-title">{title} <span class="im-row-id">{html.escape(row_id)}</span></h3>'
+            f'<section class="im-card im-card-{side}" aria-label="{html.escape(title)}">'
+            f'<h3 class="im-card-title">{html.escape(title)} '
+            f'<span class="im-row-id">{html.escape(row_id)}</span></h3>'
             f"{fields}</section>"
         )
     return f'<div class="im-compare-box"><div class="im-compare">{cards}</div></div>'
+
+
+def vendor_differs(comparisons: list[matcher.FieldComparison]) -> bool:
+    """True when the vendor names of the shown pair were compared as different."""
+    return any(comparison.field == "vendor" and comparison.status == "differ" for comparison in comparisons)
+
+
+def weak_match_html() -> str:
+    """One neutral line for a pair whose vendors differ: the closest payment is not a similar one."""
+    return f'<p class="im-weak-match" role="note">{html.escape(WEAK_MATCH_MESSAGE)}</p>'
 
 
 def panel_head_html(vendor: str, amount_cents: int, rank: int, total: int, limit: int, in_queue: bool) -> str:
@@ -363,7 +412,7 @@ def reasons_html(comparisons: list[matcher.FieldComparison], in_queue: bool) -> 
 
 def verdict_html(comparisons: list[matcher.FieldComparison], in_queue: bool, decision_value: float) -> str:
     """One card: the plain-word reasons on the left, the model's match score on the right."""
-    score = matcher.match_score(decision_value)
+    score = display_score(decision_value)
     return (
         f'<div class="im-verdict-box"><div class="im-verdict">{reasons_html(comparisons, in_queue)}'
         '<div class="im-score"><h3>Match score</h3>'
@@ -680,6 +729,8 @@ def render_comparison(dataset: Dataset, model: matcher.LearnedMatcher, selected_
 
     st.html(panel_head_html(incoming_row["vendor"], int(incoming_row["amount_cents"]),
                             int(entry["rank"]), len(dataset.queue), limit, in_queue))
+    if vendor_differs(comparisons):  # a note only; the ranking is left as the model made it
+        st.html(weak_match_html())
     st.html(cards_html(comparisons, selected_id, entry["payment_id"]))
 
     st.html(verdict_html(comparisons, in_queue, float(entry["score"])))
@@ -729,13 +780,332 @@ def render_model_details(model: matcher.LearnedMatcher, incoming_row: pd.Series,
 
 
 # --------------------------------------------------------------------------
+# Benchmark page: HTML fragments
+# --------------------------------------------------------------------------
+# Every number on this page is read from results/benchmark.json, the file that
+# evaluate.py writes. Nothing is measured or estimated here.
+
+def load_benchmark(path: Path) -> dict | None:
+    """The measured results, or None when evaluate.py has not written the file yet."""
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def counted(number: int, singular: str, plural: str) -> str:
+    """'1 ledger' or '1,475 prior payments'."""
+    return f"{number:,} {singular if number == 1 else plural}"
+
+
+def percent(value: float | None) -> str:
+    """0.65 -> '65%'. An em dash when there is no value (precision when nothing was flagged)."""
+    if value is None:
+        return matcher.BLANK_DISPLAY
+    return f"{value:.0%}"
+
+
+def share(part: int, whole: int) -> str:
+    """'3 of 247 (1.2%)', or only the two counts when the whole is zero."""
+    if whole == 0:
+        return f"{part:,} of {whole:,}"
+    return f"{part:,} of {whole:,} ({part / whole:.1%})"
+
+
+def dataset_sentence(dataset: dict) -> str:
+    """The size of a benchmark set in one sentence, from its 'dataset' entry."""
+    return (
+        f"{counted(dataset['incoming'], 'incoming invoice', 'incoming invoices')} with "
+        f"{counted(dataset['known_duplicates'], 'known duplicate', 'known duplicates')}, checked against "
+        f"{counted(dataset['prior_payments'], 'prior payment', 'prior payments')} in "
+        f"{counted(dataset['ledgers'], 'ledger', 'ledgers')}, dated "
+        f"{ledger.format_date(dataset['date_start'])} to {ledger.format_date(dataset['date_end'])}."
+    )
+
+
+def result_text(key: str, result: dict) -> str:
+    """One cell of a results table: a whole percentage for precision and recall, else a count."""
+    if key in ("precision", "recall"):
+        return percent(result[key])
+    return f"{result[key]:,}"
+
+
+def results_table_html(methods: list[dict], budget: int, caption: str) -> str:
+    """One row per method with its measured results at this review budget.
+
+    Each cell repeats its column heading in data-label. On a narrow screen the
+    stylesheet hides the heading row and shows that label beside the number.
+    """
+    headings = "".join(f'<th scope="col">{html.escape(label)}</th>' for _, label in RESULT_COLUMNS)
+    rows = ""
+    for method in methods:
+        result = method["results"][str(budget)]
+        cells = "".join(
+            f'<td data-label="{html.escape(label)}">{html.escape(result_text(key, result))}</td>'
+            for key, label in RESULT_COLUMNS
+        )
+        rows += f'<tr><th scope="row">{html.escape(method["name"])}</th>{cells}</tr>'
+    return (
+        f'<div class="im-bench-box"><table class="im-bench-table"><caption>{html.escape(caption)}</caption>'
+        f'<thead><tr><th scope="col">Method</th>{headings}</tr></thead><tbody>{rows}</tbody></table></div>'
+    )
+
+
+def definitions_html(methods: list[dict]) -> str:
+    """Each method's one-sentence definition, as written in the results file."""
+    items = "".join(
+        f"<dt>{html.escape(method['name'])}</dt><dd>{html.escape(method['definition'])}</dd>"
+        for method in methods
+    )
+    return f'<dl class="im-definitions">{items}</dl>'
+
+
+def bars_html(methods: list[dict], budget: int, known_duplicates: int) -> str:
+    """Correct matches per method as horizontal bars on one scale, from zero to all known duplicates.
+
+    Every bar is followed by its value as text ('13 of 20'), so the chart can
+    be read without the bars and without their colours.
+    """
+    rows = ""
+    for method in methods:
+        correct = method["results"][str(budget)]["correct"]
+        width = 100 * correct / known_duplicates if known_duplicates else 0
+        kind = "learned" if method["key"] == "learned" else "baseline"
+        rows += (
+            f'<li><span class="im-bar-name">{html.escape(method["name"])}</span>'
+            f'<span class="im-bar-track"><span class="im-bar im-bar-{kind}" style="width: {width:.1f}%" '
+            f'aria-hidden="true"></span><span class="im-bar-value">{correct:,} of {known_duplicates:,}</span>'
+            "</span></li>"
+        )
+    caption = (
+        f"Correct matches in the first {budget:,} reviews. Every bar starts at zero, and the full width "
+        f"stands for all {counted(known_duplicates, 'known duplicate', 'known duplicates')}."
+    )
+    return f'<figure class="im-bars"><figcaption>{html.escape(caption)}</figcaption><ul>{rows}</ul></figure>'
+
+
+def record_display(record: dict) -> dict[str, str]:
+    """The five fields of a benchmark record as shown on a card; a blank becomes an em dash."""
+    return {
+        "vendor": record["vendor"] or matcher.BLANK_DISPLAY,
+        "invoice_ref": record["invoice_ref"] or matcher.BLANK_DISPLAY,
+        "amount": ledger.format_cents(record["amount_cents"]),
+        "invoice_date": ledger.format_date(record["invoice_date"]),
+        "billing_period": ledger.format_period(record["billing_period"]) or matcher.BLANK_DISPLAY,
+    }
+
+
+def compared_payment(example: dict) -> dict:
+    """The prior payment an example is compared with.
+
+    A missed duplicate is set against the payment it really repeats; a flagged
+    invoice is set against the payment the model proposed.
+    """
+    if example["kind"] == "missed_duplicate" and example["true_payment"] is not None:
+        return example["true_payment"]
+    return example["proposed_payment"]
+
+
+def example_comparisons(example: dict) -> list[matcher.FieldComparison]:
+    """An example's stored comparisons in the form the review page's cards take."""
+    incoming_shown = record_display(example["incoming"])
+    payment_shown = record_display(compared_payment(example))
+    return [
+        matcher.FieldComparison(item["field"], item["label"], item["status"], item["evidence"],
+                                incoming_shown[item["field"]], payment_shown[item["field"]], "", "")
+        for item in example["comparisons"]
+    ]
+
+
+def example_heading(example: dict) -> str:
+    """One line that says what an example is, with its rank in the frozen ranking."""
+    rank, budget = example["rank"], example["budget"]
+    if example["kind"] == "missed_duplicate":
+        return f"A known duplicate ranked {rank:,}, below the review budget of {budget:,}"
+    if example["kind"] == "false_flag":
+        return f"A legitimate invoice that was flagged for review, ranked {rank:,} of {budget:,}"
+    return f"A known duplicate the learned model ranked {rank:,}, inside the review budget of {budget:,}"
+
+
+def cause_html(example: dict) -> str:
+    """The 'likely cause' sentence that evaluate.py wrote for an example."""
+    return f'<p class="im-cause"><strong>Likely cause.</strong> {html.escape(example["likely_cause"])}</p>'
+
+
+def example_html(example: dict) -> str:
+    """A failure example: heading, the two records side by side with their evidence, the likely cause."""
+    payment = compared_payment(example)
+    if example["kind"] == "missed_duplicate":
+        payment_title = "Prior payment it repeats"
+    else:
+        payment_title = "Prior payment the model proposed"
+    cards = cards_html(example_comparisons(example), example["incoming"]["row_id"], payment["row_id"], payment_title)
+    return (
+        f'<article class="im-example"><h3>{html.escape(example_heading(example))}</h3>'
+        f"{cards}{cause_html(example)}</article>"
+    )
+
+
+def record_line_html(title: str, record: dict) -> str:
+    """One record on one line: vendor, reference, amount, invoice date and billing period."""
+    values = f" {MIDDLE_DOT} ".join(record_display(record).values())
+    return (
+        f'<p class="im-record-line"><span class="im-label">{html.escape(title)}</span> '
+        f"{html.escape(values)}</p>"
+    )
+
+
+def brief_example_html(example: dict) -> str:
+    """A shorter example: each record on one line, the evidence labels, the likely cause."""
+    labels = "".join(
+        f'<li class="im-evidence im-evidence-{html.escape(item["status"])}">{html.escape(item["evidence"])}</li>'
+        for item in example["comparisons"]
+    )
+    return (
+        f'<article class="im-example im-example-brief"><h3>{html.escape(example_heading(example))}</h3>'
+        f'<div class="im-brief">{record_line_html("Incoming invoice", example["incoming"])}'
+        f'{record_line_html("Prior payment", compared_payment(example))}'
+        f'<ul class="im-evidence-list">{labels}</ul></div>{cause_html(example)}</article>'
+    )
+
+
+def examples_of(data: dict, kind: str) -> list[dict]:
+    """The examples of one kind ('missed_duplicate', 'false_flag' or 'caught_duplicate'); may be empty."""
+    return [example for example in data.get("examples", []) if example["kind"] == kind]
+
+
+def section_html(title: str, body: str, intro: str = "") -> str:
+    """A titled section of the benchmark page. body is HTML written by the functions above."""
+    lead = f'<p class="im-section-intro">{html.escape(intro)}</p>' if intro else ""
+    return f'<section class="im-section"><h2>{html.escape(title)}</h2>{lead}{body}</section>'
+
+
+def slices_table_html(groups: list[dict], methods: list[dict]) -> str:
+    """Legitimate invoices that were flagged, per method (rows) and per kind of vendor (columns)."""
+    labels = [VENDOR_GROUP_LABELS.get(group["group"], group["group"].capitalize()) for group in groups]
+    headings = "".join(f'<th scope="col">{html.escape(label)}</th>' for label in labels)
+    rows = ""
+    for method in methods:
+        cells = ""
+        for group, label in zip(groups, labels):
+            flagged = group["methods"][method["key"]]["legit_flagged"]
+            cells += f'<td data-label="{html.escape(label)}">{html.escape(share(flagged, group["legit_invoices"]))}</td>'
+        rows += f'<tr><th scope="row">{html.escape(method["name"])}</th>{cells}</tr>'
+    return (
+        '<div class="im-bench-box"><table class="im-bench-table">'
+        "<caption>Legitimate invoices flagged for review, out of all legitimate invoices from that kind of vendor</caption>"
+        f'<thead><tr><th scope="col">Method</th>{headings}</tr></thead><tbody>{rows}</tbody></table></div>'
+    )
+
+
+def validation_sentence(data: dict) -> str:
+    """The validation results that the settings were tuned on, one count per method."""
+    names = {method["key"]: method["name"] for method in data["methods"]}
+    counts = []
+    for key, result in data["validation_summary"].items():
+        known = result["correct"] + result["missed"]
+        counts.append(f"{names.get(key, key)} {result['correct']:,} of {known:,}")
+    return (
+        "Validation numbers used for tuning (correct matches out of known duplicates, summed over the "
+        f"validation folds): {', '.join(counts)}."
+    )
+
+
+def how_to_read_html(data: dict) -> str:
+    """What the numbers on the page can and cannot say, and how to produce them again."""
+    lines = [
+        "Results are measured on synthetic data. They are not a measure of real-world accuracy.",
+        "The test set was scored once, after the settings were frozen on validation.",
+        validation_sentence(data),
+    ]
+    items = "".join(f"<li>{html.escape(line)}</li>" for line in lines)
+    command = f'<li>To reproduce these results, run <code>{html.escape(data["command"])}</code></li>'
+    return f'<ul class="im-reading">{items}{command}</ul>'
+
+
+# --------------------------------------------------------------------------
 # Benchmark page and entry point
 # --------------------------------------------------------------------------
 
 def benchmark_page() -> None:
-    """The 'Benchmark' page. For now it is an empty state; the results view is added in a later step."""
-    st.title("Benchmark", anchor=False)
-    st.html(BENCHMARK_EMPTY_HTML)
+    """The 'Benchmark' page: what the three methods caught on the held-out test ledgers."""
+    data = load_benchmark(BENCHMARK_PATH)
+    if data is None:
+        st.title("Benchmark", anchor=False)
+        st.html(BENCHMARK_EMPTY_HTML)
+        return
+
+    head = st.container(key="benchmark_head")  # filled below, once the review budget is known
+    budget = render_budget_selector(data)
+    methods, dataset = data["methods"], data["dataset"]
+    with head:
+        st.html(f'<p class="im-eyebrow">{html.escape(data["label"])}</p>')
+        st.title(f"How many duplicates can we catch in {budget:,} reviews?", anchor=False)
+        st.html(
+            f'<p class="im-lead">Held-out test set: {html.escape(dataset_sentence(dataset))} '
+            "These vendors and dates were never seen in training.</p>"
+        )
+
+    st.html(
+        results_table_html(methods, budget, f"Results at a review budget of {budget:,}")
+        + definitions_html(methods)
+    )
+    st.html(bars_html(methods, budget, dataset["known_duplicates"]))
+    render_examples(data)
+    render_slices(data)
+    render_challenge(data)
+    st.html(section_html("How to read this", how_to_read_html(data)))
+
+
+def render_budget_selector(data: dict) -> int:
+    """The 'Review budget' control. Returns the chosen number of reviews."""
+    budgets = data["budgets"]
+    with st.container(key="benchmark_budget_area"):
+        budget = st.segmented_control("Review budget", budgets, default=data["default_budget"],
+                                      required=True, key="benchmark_budget")
+        choices = ", ".join(f"{value:,}" for value in budgets[:-1]) + f" or {budgets[-1]:,}"
+        st.caption(
+            "Every budget is a slice of the same frozen ranking: "
+            f"the first {choices} invoices of one list, reviewed from the top."
+        )
+    return int(budget) if budget is not None else int(data["default_budget"])
+
+
+def render_examples(data: dict) -> None:
+    """'Where the learned model fails' and 'What exact match misses', from the stored examples."""
+    failures = examples_of(data, "missed_duplicate") + examples_of(data, "false_flag")
+    if failures:
+        st.html(section_html(
+            "Where the learned model fails", "".join(example_html(example) for example in failures),
+            "One example of each kind of mistake at the largest budget, with the same field comparisons "
+            "the review page shows."))
+    caught = examples_of(data, "caught_duplicate")
+    if caught:
+        st.html(section_html("What exact match misses",
+                             "".join(brief_example_html(example) for example in caught)))
+
+
+def render_slices(data: dict) -> None:
+    """'Who gets held for review?': flagged legitimate invoices for organizations and for individuals."""
+    groups = data.get("slices", {}).get("vendor_kind", [])
+    if not groups:
+        return
+    note = f'<p class="im-section-note">{html.escape(HELD_FOR_REVIEW_NOTE)}</p>'
+    st.html(section_html(
+        "Who gets held for review?", slices_table_html(groups, data["methods"]) + note,
+        f"Measured at {data['default_budget']:,} reviews."))
+
+
+def render_challenge(data: dict) -> None:
+    """The hand-authored challenge set: its size, its own budget and the same table as above."""
+    challenge = data.get("challenge")
+    if not challenge:
+        return
+    budget = challenge["budget"]
+    table = results_table_html(challenge["methods"], budget, f"Challenge set results at a review budget of {budget:,}")
+    note = f'<p class="im-section-note">Note from the results file: {html.escape(challenge["note"])}.</p>'
+    st.html(section_html(
+        "Challenge set (hand-authored, reported separately)", table + note,
+        dataset_sentence(challenge["dataset"])))
 
 
 def main() -> None:

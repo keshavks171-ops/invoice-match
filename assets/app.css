@@ -721,7 +721,8 @@ summary:focus-visible,
 
 .im-empty code,
 .im-schema code,
-.im-help code {
+.im-help code,
+.im-reading code {
   padding: 2px 6px;
   background: var(--im-missing-bg);
   border-radius: 4px;
@@ -782,6 +783,360 @@ summary:focus-visible,
 .im-notice li {
   margin: 2px 0 0;
   overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- weak match note */
+
+/* Shown above the cards when the closest prior payment has a different vendor. */
+.im-weak-match {
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--im-missing-bg);
+  border-radius: 6px;
+  color: var(--im-missing-ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------------- benchmark page */
+
+.st-key-benchmark_head {
+  gap: 8px;
+}
+
+.st-key-benchmark_budget_area {
+  gap: 8px;
+}
+
+/* The small label above the title. */
+.im-eyebrow {
+  display: inline-block;
+  margin: 0;
+  padding: 3px 10px;
+  background: var(--im-missing-bg);
+  border-radius: 999px;
+  color: var(--im-missing-ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.im-lead,
+.im-section-intro {
+  max-width: 88ch;
+  margin: 0;
+  color: var(--im-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* A results table on a white surface. The box is a size container, so the
+   table can change its layout when the box (not the window) is narrow. */
+.im-bench-box {
+  container-type: inline-size;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-bench-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  color: var(--im-ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.im-bench-table caption {
+  padding: 12px 16px 4px;
+  color: var(--im-muted);
+  font-size: 13px;
+  text-align: left;
+}
+
+.im-bench-table th,
+.im-bench-table td {
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--im-border);
+  text-align: right;
+  vertical-align: baseline;
+}
+
+.im-bench-table th:first-child {
+  text-align: left;
+}
+
+.im-bench-table thead th {
+  color: var(--im-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.im-bench-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.im-bench-table tbody tr:last-child th,
+.im-bench-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Narrow box: every method becomes a block, with each number beside its
+   column name. The name comes from the data-label that app.py writes on the cell. */
+@container (max-width: 640px) {
+  .im-bench-table thead {
+    display: none;
+  }
+
+  .im-bench-table,
+  .im-bench-table caption,
+  .im-bench-table tbody {
+    display: block;
+  }
+
+  .im-bench-table tr {
+    display: block;
+    padding: 10px 16px;
+    border-top: 1px solid var(--im-border);
+  }
+
+  .im-bench-table tbody th {
+    display: block;
+    padding: 0 0 4px;
+    border: 0;
+    white-space: normal;
+  }
+
+  .im-bench-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 2px 0;
+    border: 0;
+  }
+
+  .im-bench-table td::before {
+    content: attr(data-label);
+    color: var(--im-muted);
+    font-size: 14px;
+  }
+}
+
+/* The methods' definitions under the main table: name on the left, sentence on the right. */
+.im-definitions {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 16px;
+  max-width: 960px;
+  margin: 12px 0 0;
+  padding: 0 16px;
+  color: var(--im-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.im-definitions dt {
+  color: var(--im-ink);
+  font-weight: 600;
+}
+
+.im-definitions dd {
+  margin: 0;
+}
+
+/* Bar chart: one row per method. The track's left edge is the zero line and
+   its content width is the full scale. The value is written right after the
+   bar; the padding on the right keeps room for it when a bar is full. */
+.im-bars {
+  max-width: 760px;
+  margin: 0;
+  padding: 16px 24px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-bars figcaption {
+  margin: 0 0 12px;
+  color: var(--im-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.im-bars ul {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.im-bars li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.im-bar-name {
+  color: var(--im-ink);
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.im-bar-track {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 88px 2px 0;
+  border-left: 1px solid var(--im-muted);
+}
+
+.im-bar {
+  flex: none;
+  height: 20px;
+  border-radius: 0 4px 4px 0;
+}
+
+.im-bar-learned {
+  background: var(--im-primary);
+}
+
+.im-bar-baseline {
+  background: #7D8A84;
+}
+
+.im-bar-value {
+  flex: none;
+  margin-left: 8px;
+  color: var(--im-ink);
+  font-size: 14.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Sections below the chart. */
+.im-section {
+  margin-top: 16px;
+}
+
+.im-section h2 {
+  margin: 0;
+  padding: 0;
+  color: var(--im-ink);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.im-section-intro {
+  margin-top: 4px;
+}
+
+.im-section > .im-bench-box,
+.im-section > .im-example,
+.im-section > .im-reading {
+  margin-top: 12px;
+}
+
+.im-section-note,
+.im-cause {
+  max-width: 88ch;
+  margin: 12px 0 0;
+  color: var(--im-ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* A failure example: its heading, the review page's two cards, the likely cause. */
+.im-section > .im-example + .im-example {
+  margin-top: 24px;
+}
+
+.im-example h3 {
+  margin: 0 0 8px;
+  padding: 0;
+  color: var(--im-ink);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+/* The cards are a little tighter here than on the review page. */
+.im-example .im-field {
+  padding: 6px 16px;
+}
+
+.im-example .im-field-amount .im-value {
+  font-size: 20px;
+}
+
+/* The shorter example: each record on one line. */
+.im-brief {
+  padding: 12px 16px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+}
+
+.im-record-line {
+  margin: 0;
+  color: var(--im-ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.im-record-line .im-label {
+  display: inline-block;
+  min-width: 128px;
+}
+
+.im-evidence-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.im-evidence-list li {
+  margin: 0;
+}
+
+/* 'How to read this'. */
+.im-reading {
+  padding: 16px 24px 16px 44px;
+  background: var(--im-surface);
+  border: 1px solid var(--im-border);
+  border-radius: var(--im-radius);
+  box-shadow: var(--im-shadow);
+  color: var(--im-ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.im-reading li {
+  margin: 0;
+  padding: 2px 0;
+  overflow-wrap: anywhere;
+}
+
+.im-reading li::marker {
+  color: var(--im-muted);
 }
 
 /* ---------------------------------------------------------------- narrow screens */
@@ -869,5 +1224,44 @@ summary:focus-visible,
 
   .st-key-undo {
     margin-left: 0;
+  }
+}
+
+/* Phone: the benchmark page. Definitions and bar rows put the name above its text or bar. */
+@media (max-width: 640px) {
+  .im-definitions {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .im-definitions dd {
+    margin-bottom: 8px;
+  }
+
+  .im-bars {
+    padding: 12px 16px;
+  }
+
+  .im-bars ul {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .im-bars li {
+    display: block;
+  }
+
+  .im-bar-name {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .im-reading {
+    padding: 12px 16px 12px 36px;
+  }
+
+  .im-record-line .im-label {
+    display: block;
   }
 }
