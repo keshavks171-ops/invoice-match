@@ -1,0 +1,458 @@
+{
+  "label": "Synthetic benchmark",
+  "split": "test",
+  "command": "python evaluate.py --stage test",
+  "dataset": {
+    "ledgers": 6,
+    "incoming": 360,
+    "prior_payments": 1475,
+    "known_duplicates": 20,
+    "date_start": "2025-08-04",
+    "date_end": "2026-06-27"
+  },
+  "budgets": [
+    5,
+    10,
+    20
+  ],
+  "default_budget": 20,
+  "methods": [
+    {
+      "key": "exact",
+      "name": "Exact match",
+      "definition": "Flags an invoice when a prior payment has the same vendor name, the same non-blank invoice reference and the same amount after text normalization; the closest invoice date ranks first.",
+      "eligible": 8,
+      "results": {
+        "5": {
+          "reviews_used": 5,
+          "correct": 5,
+          "false_flags": 0,
+          "missed": 15,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 8,
+          "correct": 8,
+          "false_flags": 0,
+          "missed": 12,
+          "precision": 1.0,
+          "recall": 0.4
+        },
+        "20": {
+          "reviews_used": 8,
+          "correct": 8,
+          "false_flags": 0,
+          "missed": 12,
+          "precision": 1.0,
+          "recall": 0.4
+        }
+      }
+    },
+    {
+      "key": "fuzzy",
+      "name": "Fuzzy rule",
+      "definition": "Flags an invoice when a prior payment has a vendor name at least 65% similar (RapidFuzz token_sort_ratio) and the same amount; ranked with equal references first, then by vendor-name similarity.",
+      "eligible": 122,
+      "results": {
+        "5": {
+          "reviews_used": 5,
+          "correct": 5,
+          "false_flags": 0,
+          "missed": 15,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 10,
+          "correct": 10,
+          "false_flags": 0,
+          "missed": 10,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 20,
+          "correct": 12,
+          "false_flags": 8,
+          "missed": 8,
+          "precision": 0.6,
+          "recall": 0.6
+        }
+      }
+    },
+    {
+      "key": "learned",
+      "name": "Learned model",
+      "definition": "No field is required to agree: logistic regression over 13 comparisons of an invoice with a prior payment (vendor, reference, amount, date, billing period) ranks every invoice by its best-scoring payment.",
+      "eligible": 360,
+      "results": {
+        "5": {
+          "reviews_used": 5,
+          "correct": 5,
+          "false_flags": 0,
+          "missed": 15,
+          "precision": 1.0,
+          "recall": 0.25
+        },
+        "10": {
+          "reviews_used": 10,
+          "correct": 10,
+          "false_flags": 0,
+          "missed": 10,
+          "precision": 1.0,
+          "recall": 0.5
+        },
+        "20": {
+          "reviews_used": 20,
+          "correct": 13,
+          "false_flags": 7,
+          "missed": 7,
+          "precision": 0.65,
+          "recall": 0.65
+        }
+      }
+    }
+  ],
+  "examples": [
+    {
+      "method": "learned",
+      "kind": "missed_duplicate",
+      "budget": 20,
+      "rank": 23,
+      "incoming": {
+        "row_id": "TE002-I-0002",
+        "vendor": "CATALPA STRAND PRINTING",
+        "invoice_ref": "INV-8103",
+        "amount_cents": 5579,
+        "invoice_date": "2026-01-21",
+        "billing_period": "2026-01"
+      },
+      "proposed_payment": {
+        "row_id": "TE002-P-0014",
+        "vendor": "Catalpa Strand Printing",
+        "invoice_ref": "INV-8082",
+        "amount_cents": 5579,
+        "invoice_date": "2026-01-06",
+        "billing_period": "2026-01"
+      },
+      "true_payment": {
+        "row_id": "TE002-P-0014",
+        "vendor": "Catalpa Strand Printing",
+        "invoice_ref": "INV-8082",
+        "amount_cents": 5579,
+        "invoice_date": "2026-01-06",
+        "billing_period": "2026-01"
+      },
+      "comparisons": [
+        {
+          "field": "vendor",
+          "label": "Vendor",
+          "status": "match",
+          "evidence": "Vendor names match after normalization"
+        },
+        {
+          "field": "invoice_ref",
+          "label": "Invoice reference",
+          "status": "differ",
+          "evidence": "Different invoice references"
+        },
+        {
+          "field": "amount",
+          "label": "Amount",
+          "status": "match",
+          "evidence": "Same amount"
+        },
+        {
+          "field": "invoice_date",
+          "label": "Invoice date",
+          "status": "differ",
+          "evidence": "Invoice dates 15 days apart"
+        },
+        {
+          "field": "billing_period",
+          "label": "Billing period",
+          "status": "match",
+          "evidence": "Same billing period"
+        }
+      ],
+      "likely_cause": "The right prior payment was found, but the pair ranked 23, below the review budget of 20. Compared with the payment it repeats: different invoice references; invoice dates 15 days apart."
+    },
+    {
+      "method": "learned",
+      "kind": "false_flag",
+      "budget": 20,
+      "rank": 13,
+      "incoming": {
+        "row_id": "TE002-I-0060",
+        "vendor": "Wendell Côté",
+        "invoice_ref": "2605-250",
+        "amount_cents": 15000,
+        "invoice_date": "2026-05-30",
+        "billing_period": "2026-05"
+      },
+      "proposed_payment": {
+        "row_id": "TE002-P-0221",
+        "vendor": "Wendell Côté",
+        "invoice_ref": "",
+        "amount_cents": 15000,
+        "invoice_date": "2026-05-31",
+        "billing_period": "2026-05"
+      },
+      "true_payment": null,
+      "comparisons": [
+        {
+          "field": "vendor",
+          "label": "Vendor",
+          "status": "match",
+          "evidence": "Same vendor name"
+        },
+        {
+          "field": "invoice_ref",
+          "label": "Invoice reference",
+          "status": "missing",
+          "evidence": "Invoice reference missing on prior payment"
+        },
+        {
+          "field": "amount",
+          "label": "Amount",
+          "status": "match",
+          "evidence": "Same amount"
+        },
+        {
+          "field": "invoice_date",
+          "label": "Invoice date",
+          "status": "partial",
+          "evidence": "Invoice dates 1 day apart"
+        },
+        {
+          "field": "billing_period",
+          "label": "Billing period",
+          "status": "match",
+          "evidence": "Same billing period"
+        }
+      ],
+      "likely_cause": "A legitimate invoice that resembles a prior payment: same vendor name; same amount; invoice dates 1 day apart; same billing period. What separates them: invoice reference missing on prior payment."
+    },
+    {
+      "method": "learned",
+      "kind": "caught_duplicate",
+      "budget": 20,
+      "rank": 9,
+      "incoming": {
+        "row_id": "TE001-I-0040",
+        "vendor": "Nilufar Dragomir Repairs",
+        "invoice_ref": "inv-1284",
+        "amount_cents": 6000,
+        "invoice_date": "2026-05-23",
+        "billing_period": "2026-05"
+      },
+      "proposed_payment": {
+        "row_id": "TE001-P-0214",
+        "vendor": "Nilufar Dragomir",
+        "invoice_ref": "INV1284",
+        "amount_cents": 6000,
+        "invoice_date": "2026-05-14",
+        "billing_period": "2026-05"
+      },
+      "true_payment": {
+        "row_id": "TE001-P-0214",
+        "vendor": "Nilufar Dragomir",
+        "invoice_ref": "INV1284",
+        "amount_cents": 6000,
+        "invoice_date": "2026-05-14",
+        "billing_period": "2026-05"
+      },
+      "comparisons": [
+        {
+          "field": "vendor",
+          "label": "Vendor",
+          "status": "partial",
+          "evidence": "Similar vendor names"
+        },
+        {
+          "field": "invoice_ref",
+          "label": "Invoice reference",
+          "status": "match",
+          "evidence": "References match after normalization"
+        },
+        {
+          "field": "amount",
+          "label": "Amount",
+          "status": "match",
+          "evidence": "Same amount"
+        },
+        {
+          "field": "invoice_date",
+          "label": "Invoice date",
+          "status": "differ",
+          "evidence": "Invoice dates 9 days apart"
+        },
+        {
+          "field": "billing_period",
+          "label": "Billing period",
+          "status": "match",
+          "evidence": "Same billing period"
+        }
+      ],
+      "likely_cause": "Exact match needs the same vendor, reference and amount, but here: similar vendor names. The learned model ranked the pair 9 because: similar vendor names; references match after normalization; same amount; same billing period."
+    }
+  ],
+  "slices": {
+    "vendor_kind": [
+      {
+        "group": "organization",
+        "legit_invoices": 247,
+        "known_duplicates": 14,
+        "methods": {
+          "exact": {
+            "legit_flagged": 0,
+            "duplicates_caught": 8
+          },
+          "fuzzy": {
+            "legit_flagged": 6,
+            "duplicates_caught": 10
+          },
+          "learned": {
+            "legit_flagged": 3,
+            "duplicates_caught": 10
+          }
+        }
+      },
+      {
+        "group": "individual",
+        "legit_invoices": 93,
+        "known_duplicates": 6,
+        "methods": {
+          "exact": {
+            "legit_flagged": 0,
+            "duplicates_caught": 0
+          },
+          "fuzzy": {
+            "legit_flagged": 2,
+            "duplicates_caught": 2
+          },
+          "learned": {
+            "legit_flagged": 4,
+            "duplicates_caught": 3
+          }
+        }
+      }
+    ]
+  },
+  "challenge": {
+    "dataset": {
+      "ledgers": 1,
+      "incoming": 40,
+      "prior_payments": 85,
+      "known_duplicates": 12,
+      "date_start": "2026-04-01",
+      "date_end": "2026-09-25"
+    },
+    "budget": 12,
+    "methods": [
+      {
+        "key": "exact",
+        "name": "Exact match",
+        "results": {
+          "12": {
+            "reviews_used": 4,
+            "correct": 4,
+            "false_flags": 0,
+            "missed": 8,
+            "precision": 1.0,
+            "recall": 0.3333333333333333
+          }
+        }
+      },
+      {
+        "key": "fuzzy",
+        "name": "Fuzzy rule",
+        "results": {
+          "12": {
+            "reviews_used": 12,
+            "correct": 9,
+            "false_flags": 3,
+            "missed": 3,
+            "precision": 0.75,
+            "recall": 0.75
+          }
+        }
+      },
+      {
+        "key": "learned",
+        "name": "Learned model",
+        "results": {
+          "12": {
+            "reviews_used": 12,
+            "correct": 11,
+            "false_flags": 1,
+            "missed": 1,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666
+          }
+        }
+      }
+    ],
+    "note": "hand-authored challenge set, reported separately"
+  },
+  "model": {
+    "type": "LogisticRegression",
+    "features": [
+      "vendor_tfidf_cosine",
+      "vendor_fuzzy",
+      "ref_similarity",
+      "ref_exact",
+      "ref_missing_incoming",
+      "ref_missing_payment",
+      "amount_exact",
+      "amount_diff",
+      "date_gap",
+      "period_same",
+      "period_different",
+      "period_missing_incoming",
+      "period_missing_payment"
+    ],
+    "config": {
+      "vendor_text": "core",
+      "vendor_scorer": "token_sort_ratio",
+      "amount_transform": "log1p_cents",
+      "date_transform": "log1p_days",
+      "interactions": [],
+      "C": 0.03,
+      "class_weight": null
+    }
+  },
+  "fuzzy_rule": {
+    "vendor_threshold": 0.65,
+    "amount_rule": "exact",
+    "rank_by": "ref_then_vendor",
+    "vendor_scorer": "token_sort_ratio"
+  },
+  "validation_summary": {
+    "exact": {
+      "reviews_used": 25,
+      "correct": 25,
+      "false_flags": 0,
+      "missed": 35,
+      "precision": 1.0,
+      "recall": 0.4166666666666667
+    },
+    "fuzzy": {
+      "reviews_used": 60,
+      "correct": 43,
+      "false_flags": 17,
+      "missed": 17,
+      "precision": 0.7166666666666667,
+      "recall": 0.7166666666666667
+    },
+    "learned": {
+      "reviews_used": 60,
+      "correct": 49,
+      "false_flags": 11,
+      "missed": 11,
+      "precision": 0.8166666666666667,
+      "recall": 0.8166666666666667
+    }
+  }
+}

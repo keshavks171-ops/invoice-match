@@ -640,5 +640,62 @@
         "duplicates": 3
       }
     ]
+  },
+  "test": {
+    "seed": 20260,
+    "date_range": [
+      "2025-07-01",
+      "2026-06-30"
+    ],
+    "ledgers": [
+      {
+        "ledger_id": "TE001",
+        "fold": 1,
+        "run_date": "2026-06-01",
+        "incoming": 60,
+        "payments": 237,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TE002",
+        "fold": 1,
+        "run_date": "2026-06-27",
+        "incoming": 60,
+        "payments": 254,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TE003",
+        "fold": 1,
+        "run_date": "2026-04-07",
+        "incoming": 60,
+        "payments": 248,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TE004",
+        "fold": 1,
+        "run_date": "2026-01-31",
+        "incoming": 60,
+        "payments": 247,
+        "duplicates": 3
+      },
+      {
+        "ledger_id": "TE005",
+        "fold": 1,
+        "run_date": "2026-04-07",
+        "incoming": 60,
+        "payments": 227,
+        "duplicates": 4
+      },
+      {
+        "ledger_id": "TE006",
+        "fold": 1,
+        "run_date": "2026-05-07",
+        "incoming": 60,
+        "payments": 262,
+        "duplicates": 3
+      }
+    ]
   }
 }
