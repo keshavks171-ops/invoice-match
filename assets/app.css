@@ -927,7 +927,7 @@ summary:focus-visible,
 }
 
 /* The methods' definitions under the main table: name on the left, sentence on the right. */
-.im-definitions {
+dl.im-definitions {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: 6px 16px;
@@ -1233,7 +1233,7 @@ summary:focus-visible,
 
 /* Phone: the benchmark page. Definitions and bar rows put the name above its text or bar. */
 @media (max-width: 640px) {
-  .im-definitions {
+  dl.im-definitions {
     grid-template-columns: 1fr;
     gap: 0;
     padding: 0;

@@ -548,7 +548,7 @@ def test_demo_ambiguous_case(demo):
     incoming, payments, cases = demo
     case = cases[2]
     assert demo_row(incoming, case["incoming_id"]) == {
-        "vendor": "Bayside Print & Copy", "invoice_ref": "", "amount": "125.00",
+        "vendor": "Bayside Print Co.", "invoice_ref": "", "amount": "125.00",
         "invoice_date": "2026-03-12", "billing_period": ""}
     assert demo_row(payments, case["expected_payment_id"]) == {
         "vendor": "Bayside Printing Co.", "invoice_ref": "BP-7731", "amount": "125.00",

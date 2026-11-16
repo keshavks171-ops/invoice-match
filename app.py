@@ -937,7 +937,7 @@ def example_html(example: dict) -> str:
     if example["kind"] == "missed_duplicate":
         payment_title = "Prior payment it repeats"
     else:
-        payment_title = "Prior payment the model proposed"
+        payment_title = "Proposed prior payment"
     cards = cards_html(example_comparisons(example), example["incoming"]["row_id"], payment["row_id"], payment_title)
     return (
         f'<article class="im-example"><h3>{html.escape(example_heading(example))}</h3>'

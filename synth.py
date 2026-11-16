@@ -1099,7 +1099,7 @@ def demo_cases() -> list[DemoCase]:
         "A similarly named vendor bills the same amount 16 days after a paid invoice, with no reference and "
         "no billing period to compare. The records cannot settle whether this is a second bill for the same "
         "job, so a person has to check.",
-        hand_record("Bayside Print & Copy", "", 12500, date(2026, 3, 12), ""),
+        hand_record("Bayside Print Co.", "", 12500, date(2026, 3, 12), ""),
         (hand_record("Bayside Printing Co.", "BP-7731", 12500, date(2026, 2, 24), ""),
          hand_record("Bayside Printing Co.", "BP-7716", 24000, date(2026, 1, 22), ""),
          hand_record("Bayside Printing Co.", "BP-7698", 8650, date(2025, 12, 9), "")),

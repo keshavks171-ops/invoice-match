@@ -26,7 +26,9 @@ streamlit run app.py
 Click **Load demo**. The app opens on two $468.20 invoices from "OC Event Rentals LLC"
 (INV-1042) and "O.C. Event Rentals" (1042). The **Demo cases** selector jumps to a
 legitimate recurring bill and to an ambiguous case. **Upload CSVs** takes your own two
-files (schema below). Nothing you upload is saved, logged or sent anywhere; the app
+files (schema below). More screenshots: [recurring bill](submission/screenshots/recurring-bill.png),
+[ambiguous case](submission/screenshots/ambiguous-case.png),
+[a failure](submission/screenshots/benchmark-failure.png), [phone width](submission/screenshots/mobile-review.png). Nothing you upload is saved, logged or sent anywhere; the app
 listens on your own computer only.
 
 No install? Open `submission/demo.html` in a browser for a click-through of the same
@@ -45,6 +47,8 @@ validation.
 | Exact match | 8 | 8 | 0 | 12 | 100% | 40% |
 | Fuzzy rule | 20 | 12 | 8 | 8 | 60% | 60% |
 | **Learned model** | 20 | **13** | 7 | 7 | 65% | 65% |
+
+![Benchmark page: correct matches at 20 reviews](submission/screenshots/benchmark.png)
 
 At 10 reviews: 8, 10 and 10 correct. At 5 reviews: 5, 5 and 5. Smaller budgets are
 slices of the same frozen rankings.

@@ -664,7 +664,7 @@ def test_benchmark_examples_compare_with_the_right_payment_and_escape_text():
 
     flagged = app.example_html(benchmark_example("false_flag"))
     assert "A legitimate invoice that was flagged for review" in flagged
-    assert "Proposed &amp; Co" in flagged and "Prior payment the model proposed" in flagged
+    assert "Proposed &amp; Co" in flagged and "Proposed prior payment" in flagged
 
     brief = app.brief_example_html(benchmark_example("caught_duplicate"))
     for text in (missed, flagged, brief):
